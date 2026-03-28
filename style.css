@@ -388,7 +388,7 @@ a, button, [role="button"] {
   color: var(--faint);
 }
 
-.stage-card h3 {
+.stage-card h2 {
   font-family: var(--font-display);
   font-size: var(--t-lg);
   font-weight: 700;
