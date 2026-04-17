@@ -3,155 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prompting & Tools — niconomics</title>
-<meta name="description" content="Master the art of prompting. Learn to communicate with AI models in ways that get consistently great results.">
-<link rel="preconnect" href="https://api.fontshare.com">
+<title>Prompting &amp; Tools — Nico's Codex: AI</title>
+<meta name="description" content="The highest-leverage AI skill. Learn to communicate with AI models in ways that consistently get great results.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script>
-  (function(){
-    var s=localStorage.getItem('niconomics-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-    document.documentElement.setAttribute('data-theme',s);
-  })();
-</script>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.html" class="logo">
-      <svg class="logo-icon" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-        <rect width="30" height="30" rx="7" fill="var(--cyan)" opacity=".12"/>
-        <text x="15" y="21" text-anchor="middle" font-family="'Cabinet Grotesk',sans-serif" font-weight="800" font-size="18" fill="var(--cyan)">n</text>
-      </svg>
-      <span class="logo-wordmark"><span>nic</span>onomics</span>
+<nav class="codex-nav">
+  <a href="index.html" class="codex-logo">Nico's <span class="logo-codex">Codex</span><span class="logo-colon">:</span><span class="logo-ai">AI</span></a>
+  <span class="codex-rule">Rule 78 — Knowledge is free</span>
+</nav>
+
+<main class="page-wrap">
+
+  <a href="index.html" class="back-link">← All Sections</a>
+
+  <header class="page-header codex-panel">
+    <p class="page-eyebrow">02 / Beginner</p>
+    <h1>Prompting &amp; Tools</h1>
+    <p class="page-intro">Prompting is the highest-leverage AI skill most people never learn properly. These resources teach you to communicate with AI models in ways that consistently get great results — whether you're writing, building, or automating.</p>
+  </header>
+
+  <div class="codex-divider"></div>
+
+  <div class="resource-grid">
+
+    <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 0ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Anthropic Prompt Engineering Guide</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="resource-desc">The official guide from the team that builds Claude. Covers chaining, XML tags, role prompting, and structured outputs.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Always current</span>
+          <span class="chip">Web</span>
+          <span class="chip">Anthropic</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
     </a>
-    <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme"></button>
+
+    <a href="https://learnprompting.org" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 80ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Learn Prompting</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="resource-desc">Open-source, community-maintained prompt engineering handbook. Goes from basics to advanced techniques across all major models.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Self-paced</span>
+          <span class="chip">Open Source</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://claude.com/resources/tutorials/applying-claude-opus-4-5s-strengths-to-your-everyday-work" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 160ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Applying Claude's Strengths (Official Tutorial)</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="resource-desc">Anthropic's own tutorial for getting the most out of Claude — infinite context, document creation, code persistence, and vision tasks.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Web</span>
+          <span class="chip">Anthropic</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 240ms">
+      <div class="resource-card-top">
+        <span class="resource-title">ChatGPT Prompt Engineering for Developers</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="resource-desc">The classic short course on systematic prompt design. Model-agnostic — every technique applies to Claude too.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">~1.5 hrs</span>
+          <span class="chip">DeepLearning.AI</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://github.com/microsoft/generative-ai-for-beginners" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 320ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Generative AI for Beginners (GitHub)</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="resource-desc">21-lesson curriculum covering prompting, RAG, agents, and deployment. Project-based, fully open source.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Open Source</span>
+          <span class="chip">GitHub</span>
+          <span class="chip">Microsoft</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
   </div>
-</header>
 
-<div class="stage-page-wrap">
-
-  <a href="index.html" class="back-link">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    All Stages
-  </a>
-
-  <div class="stage-hero">
-    <div class="stage-eyebrow">
-      <span class="badge badge-beginner">Beginner</span>
-    </div>
-    <h1>Prompting & Tools</h1>
-    <p>The highest-leverage skill in AI. Learn to write prompts that get the results you actually want — every time. These resources are free references you'll return to again and again.</p>
-    <div class="stage-hero-stats">
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-        4 resources
-      </span>
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Self-paced
-      </span>
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        100% free
-      </span>
-    </div>
-  </div>
-
-  <main class="resource-grid">
-
-    <a href="https://learnprompting.org" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">📖</div>
-          <span class="provider-name">Learn Prompting</span>
-        </div>
-        <span class="resource-type">Start Here</span>
-      </div>
-      <div class="resource-title">Learn Prompting</div>
-      <div class="resource-desc">The most comprehensive free guide to prompt engineering — covering everything from basic principles to advanced techniques like chain-of-thought, few-shot prompting, and ReAct. Community-maintained and constantly updated. Start at the beginning and work through it.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Open source</span>
-        <span class="chip">Beginner → Advanced</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://www.promptingguide.ai" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🔬</div>
-          <span class="provider-name">DAIR.AI</span>
-        </div>
-        <span class="resource-type">Reference</span>
-      </div>
-      <div class="resource-title">Prompt Engineering Guide</div>
-      <div class="resource-desc">Research-backed prompting guide maintained by DAIR.AI. Covers zero-shot, few-shot, chain-of-thought, self-consistency, tree-of-thought, and more. More technical than Learn Prompting — great as a second reference once you know the basics.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Research-backed</span>
-        <span class="chip">Intermediate</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🤖</div>
-          <span class="provider-name">Anthropic</span>
-        </div>
-        <span class="resource-type">Docs</span>
-      </div>
-      <div class="resource-title">Anthropic Prompt Engineering Guide</div>
-      <div class="resource-desc">Anthropic's official prompt engineering documentation — written for Claude but the principles apply broadly to any model. Covers role prompting, XML tags, chain-of-thought, and common pitfalls. Free, no account needed.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Official docs</span>
-        <span class="chip">Beginner</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://cookbook.openai.com" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🟢</div>
-          <span class="provider-name">OpenAI</span>
-        </div>
-        <span class="resource-type">Reference</span>
-      </div>
-      <div class="resource-title">OpenAI Cookbook</div>
-      <div class="resource-desc">OpenAI's collection of practical examples and guides — from basic prompting to building with the API, function calling, embeddings, and RAG. Use it as a reference when you want to see how specific techniques are applied in real code.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">GitHub</span>
-        <span class="chip">Intermediate</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-  </main>
-
-  <nav class="stage-footer-nav" aria-label="Stage navigation">
-    <a href="foundations.html" class="btn btn-outline btn-sm nav-left">← Stage 1</a>
-    <span class="nav-center">Prompting & Tools</span>
-    <a href="building.html" class="btn btn-primary btn-sm nav-right">Next: Build with AI →</a>
+  <nav class="page-nav">
+    <a href="foundations.html" class="page-nav-btn nav-prev">← 01 Foundations</a>
+    <span class="nav-center">Nico's Codex: AI</span>
+    <a href="building.html" class="page-nav-btn nav-next">03 Building →</a>
   </nav>
 
-</div>
+</main>
 
-<footer class="footer">
-  <div class="footer-inner">
-    <p>All resources are 100% free — no trials, no paywalls. <a href="index.html">← Back to all stages</a></p>
-  </div>
+<footer class="codex-footer">
+  <span>Updated April 2026</span>
+  <span>Every resource is 100% free — no trials, no paywalls.</span>
 </footer>
 
-<script src="main.js"></script>
 </body>
 </html>

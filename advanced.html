@@ -3,177 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Go Deep — niconomics</title>
-<meta name="description" content="University-level AI depth — neural networks, deep learning, LLMs. The full technical picture, completely free.">
-<link rel="preconnect" href="https://api.fontshare.com">
+<title>Go Deep — Nico's Codex: AI</title>
+<meta name="description" content="Neural networks, deep learning, LLMs. University-level depth on how the models actually work.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script>
-  (function(){
-    var s=localStorage.getItem('niconomics-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-    document.documentElement.setAttribute('data-theme',s);
-  })();
-</script>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.html" class="logo">
-      <svg class="logo-icon" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-        <rect width="30" height="30" rx="7" fill="var(--cyan)" opacity=".12"/>
-        <text x="15" y="21" text-anchor="middle" font-family="'Cabinet Grotesk',sans-serif" font-weight="800" font-size="18" fill="var(--cyan)">n</text>
-      </svg>
-      <span class="logo-wordmark"><span>nic</span>onomics</span>
-    </a>
-    <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme"></button>
-  </div>
-</header>
+<nav class="codex-nav">
+  <a href="index.html" class="codex-logo">Nico's <span class="logo-codex">Codex</span><span class="logo-colon">:</span><span class="logo-ai">AI</span></a>
+  <span class="codex-rule">Rule 78 — Knowledge is free</span>
+</nav>
 
-<div class="stage-page-wrap">
+<main class="page-wrap">
 
-  <a href="index.html" class="back-link">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-    All Stages
-  </a>
+  <a href="index.html" class="back-link">← All Sections</a>
 
-  <div class="stage-hero">
-    <div class="stage-eyebrow">
-      <span class="badge badge-advanced">Advanced</span>
-    </div>
+  <header class="page-header codex-panel">
+    <p class="page-eyebrow">04 / Advanced</p>
     <h1>Go Deep</h1>
-    <p>University-level courses and expert-taught content for when you want the full technical picture. Pick the path that fits where you want to go — all of it is free.</p>
-    <div class="stage-hero-stats">
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-        5 resources
-      </span>
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        ~60+ hrs
-      </span>
-      <span class="stage-hero-stat">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        100% free
-      </span>
-    </div>
+    <p class="page-intro">University-level depth. These are the resources that explain how the models actually work — transformers, training, fine-tuning, agents. Take these when you want the full technical picture.</p>
+  </header>
+
+  <div class="codex-divider"></div>
+
+  <div class="resource-grid">
+
+    <a href="https://course.fast.ai" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 0ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Fast.ai — Practical Deep Learning for Coders</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <p class="resource-desc">The best hands-on deep learning course on the internet. Top-down teaching: you build first, understand the theory second.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">~30 hrs</span>
+          <span class="chip">Python</span>
+          <span class="chip">fast.ai</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://www.youtube.com/playlist?list=PLoROMvodv4rMFqRtEuo6SGjY4XbRIVx76" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 80ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Stanford CS224N — NLP with Deep Learning</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <p class="resource-desc">Full university course covering transformers, LLMs, fine-tuning, and agents. Freely released on YouTube.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">~60 hrs</span>
+          <span class="chip">YouTube</span>
+          <span class="chip">Stanford</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 160ms">
+      <div class="resource-card-top">
+        <span class="resource-title">3Blue1Brown — Neural Networks Series</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="resource-desc">The most beautiful visual explanation of how neural networks learn. Six videos, no prerequisites, unforgettable.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">~3 hrs</span>
+          <span class="chip">YouTube</span>
+          <span class="chip">3Blue1Brown</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://cs50.harvard.edu/ai/" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 240ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Harvard CS50 AI</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <p class="resource-desc">Structured university course covering search, knowledge, uncertainty, neural nets, and NLP. Python-based with real projects.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free to audit</span>
+          <span class="chip">~7 weeks</span>
+          <span class="chip">Harvard</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://github.com/rasbt/LLMs-from-scratch" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 320ms">
+      <div class="resource-card-top">
+        <span class="resource-title">LLMs from Scratch (GitHub)</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <p class="resource-desc">Build a GPT-style model from raw components. The best resource for understanding how LLMs work at a mechanical level.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Open Source</span>
+          <span class="chip">Python</span>
+          <span class="chip">Sebastian Raschka</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
   </div>
 
-  <main class="resource-grid">
-
-    <a href="https://www.youtube.com/@AndrejKarpathy" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">▶️</div>
-          <span class="provider-name">Andrej Karpathy</span>
-        </div>
-        <span class="resource-type">Start Here</span>
-      </div>
-      <div class="resource-title">Neural Networks: Zero to Hero</div>
-      <div class="resource-desc">Andrej Karpathy (former OpenAI, Tesla) builds neural networks from scratch — starting with micrograd, through backpropagation, to building a GPT from first principles. The best bottom-up explanation of how LLMs work. Free on YouTube.</div>
-      <div class="resource-meta">
-        <span class="chip">~20 hrs</span>
-        <span class="chip chip-free">Free</span>
-        <span class="chip">YouTube</span>
-        <span class="chip">From first principles</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://course.fast.ai" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🚀</div>
-          <span class="provider-name">fast.ai</span>
-        </div>
-        <span class="resource-type">Course</span>
-      </div>
-      <div class="resource-title">Practical Deep Learning for Coders</div>
-      <div class="resource-desc">Top-down approach: build working models first, understand theory as you go. Widely considered the best free deep learning course online — covers vision, NLP, tabular data, and generative models using PyTorch and fastai. Always free.</div>
-      <div class="resource-meta">
-        <span class="chip">~30 hrs</span>
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Python required</span>
-        <span class="chip">Intermediate</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://cs229.stanford.edu" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🏛</div>
-          <span class="provider-name">Stanford University</span>
-        </div>
-        <span class="resource-type">University Course</span>
-      </div>
-      <div class="resource-title">Stanford CS229 — Machine Learning</div>
-      <div class="resource-desc">Andrew Ng's original Stanford ML course — lecture notes, problem sets, and slides freely available. Covers supervised learning, unsupervised learning, reinforcement learning, and the mathematical foundations underneath all of it.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Lecture notes</span>
-        <span class="chip">Math-heavy</span>
-        <span class="chip">Advanced</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://huggingface.co/learn/nlp-course" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">🤗</div>
-          <span class="provider-name">Hugging Face</span>
-        </div>
-        <span class="resource-type">Course</span>
-      </div>
-      <div class="resource-title">Hugging Face NLP & LLM Course</div>
-      <div class="resource-desc">The definitive free course for working with transformers and large language models — tokenization, fine-tuning, building NLP pipelines, and deploying models. Built by the team that maintains the Transformers library. Completely free.</div>
-      <div class="resource-meta">
-        <span class="chip">~10 hrs</span>
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Python required</span>
-        <span class="chip">Intermediate</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-    <a href="https://huggingface.co/papers" target="_blank" rel="noopener noreferrer" class="resource-card">
-      <div class="resource-card-top">
-        <div class="resource-provider">
-          <div class="provider-icon">📄</div>
-          <span class="provider-name">Hugging Face</span>
-        </div>
-        <span class="resource-type">Research Feed</span>
-      </div>
-      <div class="resource-title">Hugging Face Papers</div>
-      <div class="resource-desc">Daily feed of the most important AI research papers, curated and discussed by the community. The best free way to stay on top of what's actually happening at the frontier of AI research. No account required.</div>
-      <div class="resource-meta">
-        <span class="chip chip-free">Free</span>
-        <span class="chip">Daily updates</span>
-        <span class="chip">Research frontier</span>
-      </div>
-      <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
-    </a>
-
-  </main>
-
-  <nav class="stage-footer-nav" aria-label="Stage navigation">
-    <a href="building.html" class="btn btn-outline btn-sm nav-left">← Stage 3</a>
-    <span class="nav-center">Go Deep</span>
-    <a href="podcasts.html" class="btn btn-primary btn-sm nav-right">Next: Podcasts →</a>
+  <nav class="page-nav">
+    <a href="building.html" class="page-nav-btn nav-prev">← 03 Building</a>
+    <span class="nav-center">Nico's Codex: AI</span>
+    <a href="podcasts.html" class="page-nav-btn nav-next">05 Podcasts →</a>
   </nav>
 
-</div>
+</main>
 
-<footer class="footer">
-  <div class="footer-inner">
-    <p>All resources are 100% free — no trials, no paywalls. <a href="index.html">← Back to all stages</a></p>
-  </div>
+<footer class="codex-footer">
+  <span>Updated April 2026</span>
+  <span>Every resource is 100% free — no trials, no paywalls.</span>
 </footer>
 
-<script src="main.js"></script>
 </body>
 </html>

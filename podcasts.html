@@ -1,253 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stay Sharp — Podcasts — niconomics</title>
-  <meta name="description" content="The best free AI podcasts to keep you current while you commute, exercise, or cook.">
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script>
-    var t = localStorage.getItem('niconomics-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', t);
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stay Sharp — Podcasts — Nico's Codex: AI</title>
+<meta name="description" content="The best free AI podcasts for commutes, workouts, and background learning. Long-form deep dives and short daily briefings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">
-        <svg class="logo-icon" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-          <rect width="30" height="30" fill="var(--cyan)" opacity=".12"/>
-          <text text-anchor="middle" font-family="'Cabinet Grotesk',sans-serif" font-weight="800" font-size="18" fill="var(--cyan)" x="15" y="21">n</text>
-        </svg>
-        <span class="logo-wordmark"><span>nic</span><span>onomics</span></span>
-      </a>
-      <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme"></button>
-    </div>
+<nav class="codex-nav">
+  <a href="index.html" class="codex-logo">Nico's <span class="logo-codex">Codex</span><span class="logo-colon">:</span><span class="logo-ai">AI</span></a>
+  <span class="codex-rule">Rule 78 — Knowledge is free</span>
+</nav>
+
+<main class="page-wrap">
+
+  <a href="index.html" class="back-link">← All Sections</a>
+
+  <header class="page-header codex-panel">
+    <p class="page-eyebrow">05 / All Levels</p>
+    <h1>Stay Sharp — Podcasts</h1>
+    <p class="page-intro">The best free AI podcasts for commutes, workouts, and background learning. Split into long-form for deep thinking and short-form for keeping a daily pulse.</p>
   </header>
 
-  <div class="stage-page-wrap">
+  <div class="codex-divider"></div>
 
-    <a href="index.html" class="back-link">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-        <path d="M19 12H5M12 5l-7 7 7 7"/>
-      </svg>
-      All Stages
-    </a>
+  <p class="podcast-section-label">Long-Form — Deep Dives</p>
 
-    <div class="stage-hero">
-      <div class="stage-eyebrow">
+  <div class="resource-grid">
+
+    <a href="https://lexfridman.com/podcast" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 0ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Lex Fridman Podcast</span>
         <span class="badge badge-all">All Levels</span>
       </div>
-      <h1>Stay Sharp</h1>
-      <p>AI moves fast. These podcasts keep you current while you're away from a screen — commuting, exercising, or just going about your day.</p>
-      <div class="stage-hero-stats">
-        <span class="stage-hero-stat">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
-          </svg>
-          7 podcasts
-        </span>
-        <span class="stage-hero-stat">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-          Ongoing
-        </span>
-        <span class="stage-hero-stat">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-          Free on all platforms
-        </span>
+      <p class="resource-desc">2–4 hour conversations with top AI researchers, founders, and thinkers. Best for big-picture strategy and philosophy of AI.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Irregular</span>
+          <span class="chip">~3 hrs avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
       </div>
-    </div>
+    </a>
 
-    <main class="resource-grid">
-
-      <!-- 1. AI Daily Brief — NEW -->
-      <a href="https://www.youtube.com/@AIDailyBrief" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">Nathaniel Whittemore</span>
-          </div>
-          <span class="resource-type">Podcast · Daily</span>
-        </div>
-        <div class="resource-title">AI Daily Brief</div>
-        <div class="resource-desc">The fastest way to stay current on AI without the noise. Nathaniel Whittemore breaks down the most important AI news, releases, and developments every day in a tight, digestible format. If you only follow one AI podcast, make it this one.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">YouTube + all platforms</span>
-          <span class="chip">Daily</span>
-          <span class="chip">All levels</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 2. Lex Fridman -->
-      <a href="https://lexfridman.com/podcast/" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">Lex Fridman</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">Lex Fridman Podcast</div>
-        <div class="resource-desc">Long-form conversations with the people shaping AI — Sam Altman, Andrej Karpathy, Yann LeCun, Ilya Sutskever, and many more. Deep, unfiltered, and worth the time investment.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">YouTube + all platforms</span>
-          <span class="chip">Long-form</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 3. TWIML AI -->
-      <a href="https://twimlai.com/podcast/twimlai/" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">TWIML AI</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">This Week in Machine Learning & AI</div>
-        <div class="resource-desc">One of the longest-running ML podcasts. Weekly interviews with researchers and practitioners across academia and industry covering the latest in AI and machine learning.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Weekly</span>
-          <span class="chip">Intermediate+</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 4. Practical AI -->
-      <a href="https://changelog.com/practicalai" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">Changelog</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">Practical AI</div>
-        <div class="resource-desc">Focused on making AI genuinely useful — real applications, real tools, real practitioners. Grounded conversations that skip the hype and get to what actually matters for people building and using AI today.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Weekly</span>
-          <span class="chip">All levels</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 5. No Priors -->
-      <a href="https://www.youtube.com/@NoPriorsPodcast" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">No Priors</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">No Priors</div>
-        <div class="resource-desc">Conversations with AI founders, researchers, and operators about where the technology is going. Hosted by investors who know the space deeply — sharp questions, sharp guests, no fluff.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">YouTube + all platforms</span>
-          <span class="chip">Intermediate</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 6. AI Today -->
-      <a href="https://www.cognilytica.com/aitoday/" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">Cognilytica</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">AI Today Podcast</div>
-        <div class="resource-desc">Practical, business-focused AI coverage — enterprise AI adoption, emerging trends, and real-world case studies. Great for understanding how AI is actually being applied across industries right now.</div>
-        <div class="resource-meta">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Regular</span>
-          <span class="chip">All levels</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-      <!-- 7. Latent Space -->
-      <a href="https://www.latent.space/podcast" target="_blank" rel="noopener noreferrer" class="resource-card">
-        <div class="resource-card-top">
-          <div class="resource-provider">
-            <div class="provider-icon">🎙</div>
-            <span class="provider-name">Latent Space</span>
-          </div>
-          <span class="resource-type">Podcast</span>
-        </div>
-        <div class="resource-title">Latent Space: The AI Engineer Podcast</div>
-        <div class="resource-desc">By AI engineers, for AI engineers. Covers the tools, frameworks, and thinking behind building real AI products. One of the most technically rigorous podcasts in the space — worth it once you're ready to go deeper.</div>
-        <div class="resource-meta">
-          <span class="chip chip-partial">Most episodes free</span>
-          <span class="chip">Weekly</span>
-          <span class="chip">Technical</span>
-          <span class="chip">Intermediate+</span>
-        </div>
-        <svg class="resource-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M7 17L17 7M7 7h10v10"/>
-        </svg>
-      </a>
-
-    </main>
-
-    <!-- Completion -->
-    <div style="margin-top: var(--s12); padding: var(--s10) var(--s8); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); text-align: center; position: relative; overflow: hidden;">
-      <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 60% at 50% 0%, var(--purple-g) 0%, transparent 70%);"></div>
-      <div style="position: relative;">
-        <div style="font-family: var(--font-display); font-size: var(--t-xl); font-weight: 800; letter-spacing: -.03em; margin-bottom: var(--s3);">One more step.</div>
-        <p style="font-size: var(--t-sm); color: var(--muted); margin: 0 auto var(--s6); max-width: 420px; line-height: 1.6;">You're listening to the right podcasts. Now meet the people making the news — the researchers, founders, and builders shaping AI.</p>
-        <div style="display: flex; justify-content: center; gap: var(--s3); flex-wrap: wrap;">
-          <a href="leaders-in-ai.html" class="btn btn-primary">Leaders in AI →</a>
-          <a href="index.html" class="btn btn-outline">Back to Home</a>
-        </div>
+    <a href="https://www.dwarkeshpatel.com/podcast" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 80ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Dwarkesh Podcast</span>
+        <span class="badge badge-all">All Levels</span>
       </div>
-    </div>
+      <p class="resource-desc">Sharp interviews with people like Demis Hassabis and Sam Altman — focused on scaling laws, lab strategy, and frontier AI.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Biweekly</span>
+          <span class="chip">~2 hrs avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
 
-    <nav class="stage-footer-nav" aria-label="Stage navigation">
-      <a href="advanced.html" class="btn btn-outline btn-sm nav-left">← Stage 4</a>
-      <span class="nav-center">Podcasts</span>
-      <a href="leaders-in-ai.html" class="btn btn-primary btn-sm nav-right">Leaders in AI →</a>
-    </nav>
+    <a href="https://www.latent.space/podcast" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 160ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Latent Space</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="resource-desc">The "AI engineer" podcast. Concrete discussions on RAG, agents, evals, and deployment. Built for builders, not spectators.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Weekly</span>
+          <span class="chip">~1.5 hrs avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://www.nytimes.com/column/hard-fork" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 240ms">
+      <div class="resource-card-top">
+        <span class="resource-title">Hard Fork (NYT)</span>
+        <span class="badge badge-all">All Levels</span>
+      </div>
+      <p class="resource-desc">Weekly NYT tech show with sharp, accessible coverage of AI news, policy, and industry shifts. Good gateway for non-technical listeners too.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Weekly</span>
+          <span class="chip">~1 hr avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
 
   </div>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      All resources are 100% free unless marked otherwise. <a href="index.html">← Back to all stages</a>
-    </div>
-  </footer>
+  <p class="podcast-section-label" style="margin-top: var(--s8);">Short-Form — Quick Pulse</p>
 
-  <script src="main.js"></script>
+  <div class="resource-grid">
+
+    <a href="https://www.aidailybrief.com" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 0ms">
+      <div class="resource-card-top">
+        <span class="resource-title">The AI Daily Brief</span>
+        <span class="badge badge-all">All Levels</span>
+      </div>
+      <p class="resource-desc">Fast daily updates on new tools, model releases, and headlines. 10–15 minutes, high signal.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Daily</span>
+          <span class="chip">~12 min avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://www.theaibreakdown.com" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 80ms">
+      <div class="resource-card-top">
+        <span class="resource-title">The AI Breakdown</span>
+        <span class="badge badge-all">All Levels</span>
+      </div>
+      <p class="resource-desc">Short explainers on what happened in AI this week and why it matters. Good for non-technical context.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Daily</span>
+          <span class="chip">~15 min avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+    <a href="https://twimlai.com" target="_blank" rel="noopener" class="resource-card" style="animation-delay: 160ms">
+      <div class="resource-card-top">
+        <span class="resource-title">TWIML AI Podcast</span>
+        <span class="badge badge-advanced">Advanced</span>
+      </div>
+      <p class="resource-desc">Hundreds of episodes on applied ML, MLOps, and research. More technical than most — great for going deep on a specific topic.</p>
+      <div class="resource-meta-row">
+        <div class="resource-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Weekly</span>
+          <span class="chip">~1 hr avg</span>
+        </div>
+        <span class="resource-open">Open →</span>
+      </div>
+    </a>
+
+  </div>
+
+  <nav class="page-nav">
+    <a href="advanced.html" class="page-nav-btn nav-prev">← 04 Go Deep</a>
+    <span class="nav-center">Nico's Codex: AI</span>
+    <a href="leaders-in-ai.html" class="page-nav-btn nav-next">06 Leaders →</a>
+  </nav>
+
+</main>
+
+<footer class="codex-footer">
+  <span>Updated April 2026</span>
+  <span>Every resource is 100% free — no trials, no paywalls.</span>
+</footer>
+
 </body>
 </html>
