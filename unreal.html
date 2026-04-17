@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unreal Engine / Game Dev — Nico's Codex</title>
+<meta name="description" content="Curated Unreal Engine and game dev resources — documentation, Blueprints, C++, free assets, and community. Free. No paywalls.">
+<style>
+/* ── RESET & TOKENS ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+:root {
+  --bg:        #0a0a0a;
+  --bg2:       #111111;
+  --bg3:       #171717;
+  --accent:    #b8f53c;
+  --accent-d:  #7aab1e;
+  --accent-gl: rgba(184,245,60,0.10);
+  --border:    #1e1e1e;
+  --border-hi: #2a2a2a;
+  --text:      #d4d4d4;
+  --text-hi:   #f0f0f0;
+  --muted:     #666666;
+  --dim:       #333333;
+  --mono:      'Courier New', Courier, monospace;
+  --serif:     Georgia, 'Times New Roman', serif;
+}
+
+/* ── BASE ─────────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.65;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── STICKY HEADER ────────────────────────────────────────────── */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 1.5rem;
+  background: rgba(10,10,10,0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+.brand { font-family: var(--mono); font-size: 0.88rem; font-weight: bold; color: var(--accent); letter-spacing: 0.02em; }
+.brand:hover { opacity: 0.8; }
+.header-rule { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
+
+/* ── BREADCRUMB ───────────────────────────────────────────────── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.55rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+}
+.breadcrumb a { color: var(--muted); transition: color 0.12s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--dim); }
+.bc-cur { color: var(--text); }
+
+/* ── PAGE WRAPPER ─────────────────────────────────────────────── */
+.page-wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; flex: 1; }
+
+/* ── HERO ─────────────────────────────────────────────────────── */
+.hero { padding: 3rem 0 2.25rem; }
+.sector-label {
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.3em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 0.8rem;
+}
+.hero h1 {
+  font-family: var(--mono); font-size: clamp(1.85rem, 4vw, 2.8rem);
+  font-weight: bold; color: var(--text-hi); margin-bottom: 1rem; line-height: 1.1;
+}
+.hero h1 .hl { color: var(--accent); }
+.hero-sub { font-size: 0.9375rem; color: var(--muted); max-width: 600px; line-height: 1.75; }
+
+/* ── SECTION JUMP NAV ────────────────────────────────────────── */
+.section-nav {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0 0 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.section-nav-label {
+  font-family: var(--mono); font-size: 0.65rem; color: var(--dim);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-right: 0.25rem;
+}
+.snav-btn {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+  letter-spacing: 0.06em; padding: 4px 12px;
+  border: 1px solid var(--border-hi); border-radius: 1px;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.snav-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-gl); }
+.snav-sep { color: var(--dim); font-family: var(--mono); font-size: 0.7rem; }
+
+/* ── SUBSECTION HEADER ────────────────────────────────────────── */
+.sub-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 2.25rem 0 1rem; flex-wrap: wrap;
+}
+.sub-pill {
+  font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 2px;
+  white-space: nowrap; border: 1px solid;
+}
+.pill-learn { background: rgba(251,146,60,0.07); color: #fb923c; border-color: rgba(251,146,60,0.25); }
+.pill-build { background: rgba(167,139,250,0.07); color: #a78bfa; border-color: rgba(167,139,250,0.25); }
+.sub-title  { font-family: var(--mono); font-size: 0.82rem; color: var(--text); letter-spacing: 0.03em; flex: 1; }
+.sub-count  { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+
+/* ── CARD GRID ────────────────────────────────────────────────── */
+.card-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 0.875rem; margin-bottom: 1rem;
+}
+
+/* ── RESOURCE CARD ────────────────────────────────────────────── */
+.r-card {
+  display: flex; flex-direction: column;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 0.85rem 1rem 0.75rem;
+  transition: border-color 0.14s, transform 0.14s;
+  position: relative; overflow: hidden;
+  opacity: 0; animation: fadeUp 0.35s ease forwards;
+}
+.r-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-d), transparent);
+  opacity: 0; transition: opacity 0.14s;
+}
+.r-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+.r-card:hover::after { opacity: 1; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-step { font-family: var(--mono); font-size: 0.6rem; color: var(--dim); letter-spacing: 0.12em; margin-bottom: 0.4rem; display: block; }
+.card-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.55rem; }
+.card-title { font-family: var(--mono); font-size: 0.8rem; color: var(--text-hi); line-height: 1.4; flex: 1; }
+
+/* ── LEVEL BADGES ─────────────────────────────────────────────── */
+.badge { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.08em; padding: 2px 6px; border: 1px solid; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; border-radius: 1px; }
+.badge-beginner     { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+.badge-intermediate { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
+.badge-advanced     { color: #f472b6; border-color: rgba(244,114,182,0.35); }
+.badge-all          { color: var(--accent); border-color: rgba(184,245,60,0.35); }
+
+.card-desc {
+  font-size: 0.79rem; color: var(--muted); line-height: 1.62; flex: 1; margin-bottom: 0.75rem;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border);
+  margin-top: auto; flex-wrap: wrap;
+}
+.meta-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.chip { font-family: var(--mono); font-size: 0.6rem; padding: 2px 6px; border: 1px solid var(--border-hi); color: var(--muted); white-space: nowrap; border-radius: 1px; }
+.chip-free { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+.card-open { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); white-space: nowrap; transition: color 0.12s; flex-shrink: 0; }
+.r-card:hover .card-open { color: var(--accent); }
+
+/* ── FULL-WIDTH DIVIDER ───────────────────────────────────────── */
+.full-divider { border: none; border-top: 1px solid var(--border-hi); margin: 3rem 0 2.5rem; }
+
+/* ── DEMO BANNER ──────────────────────────────────────────────── */
+.demo-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.5rem; flex-wrap: wrap;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg2); border: 1px solid var(--border-hi);
+  margin-bottom: 3rem;
+}
+.demo-left { flex: 1; min-width: 0; }
+.demo-tag { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.28em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.3rem; }
+.demo-title { font-family: var(--mono); font-size: 1rem; color: var(--text-hi); font-weight: bold; margin-bottom: 0.35rem; }
+.demo-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+.demo-link {
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em;
+  color: var(--muted); padding: 0.55rem 1.1rem;
+  border: 1px solid var(--border-hi); white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s, background 0.12s; flex-shrink: 0;
+}
+.demo-link:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-gl); }
+
+/* ── SITE FOOTER ──────────────────────────────────────────────── */
+.site-footer {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 1.4rem 1.5rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem;
+}
+.footer-brand { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); font-weight: bold; }
+.footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+.footer-nav a { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); transition: color 0.12s; }
+.footer-nav a:hover { color: var(--accent); }
+.footer-date    { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); }
+.footer-tagline { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); }
+
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .page-wrap   { padding: 0 1rem; }
+  .site-header { padding: 0.6rem 1rem; }
+  .header-rule { display: none; }
+  .breadcrumb  { padding: 0.5rem 1rem; font-size: 0.65rem; }
+  .hero        { padding: 2rem 0 1.5rem; }
+  .card-grid   { grid-template-columns: 1fr; }
+  .demo-banner { flex-direction: column; align-items: flex-start; }
+}
+@media (min-width: 601px) and (max-width: 860px) {
+  .card-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- STICKY HEADER -->
+<header class="site-header">
+  <a href="index.html" class="brand">Nico's Codex</a>
+  <span class="header-rule">Rule 78 — Knowledge is free</span>
+</header>
+
+<!-- BREADCRUMB -->
+<nav class="breadcrumb" aria-label="breadcrumb">
+  <a href="index.html">← All Sectors</a>
+  <span class="bc-sep">/</span>
+  <span>Sector_04</span>
+  <span class="bc-sep">/</span>
+  <span class="bc-cur">Unreal Engine / Game Dev</span>
+</nav>
+
+<!-- MAIN -->
+<main class="page-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="sector-label">04 / All Levels</p>
+    <h1># <span class="hl">Unreal Engine</span> / Game Dev</h1>
+    <p class="hero-sub">Curated resources for learning Unreal Engine 5 — official docs, Blueprint scripting, C++ development, and free assets. Whether you've never opened the editor or you're shipping your first title, everything here is free.</p>
+  </section>
+
+  <!-- SECTION JUMP NAV -->
+  <nav class="section-nav" aria-label="Jump to section">
+    <span class="section-nav-label">Jump to:</span>
+    <a href="#section-learn" class="snav-btn">Learn — Docs, Courses &amp; Tutorials</a>
+    <span class="snav-sep">·</span>
+    <a href="#section-build" class="snav-btn">Build — C++, Assets &amp; Community</a>
+  </nav>
+
+  <!-- SECTION: LEARN -->
+  <div id="section-learn">
+    <div class="sub-header">
+      <span class="sub-pill pill-learn">Learn</span>
+      <span class="sub-title">Docs · Courses · Tutorials</span>
+      <span class="sub-count">6 resources</span>
+    </div>
+
+    <div class="card-grid">
+
+      <a href="https://dev.epicgames.com/community/learning/courses/ZpX/your-first-hour-in-unreal-engine-5"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+        <span class="card-step">01</span>
+        <div class="card-top">
+          <span class="card-title">Your First Hour in Unreal Engine 5</span>
+          <span class="badge badge-beginner">Beginner</span>
+        </div>
+        <p class="card-desc">Epic's official 1-hour onboarding course. Zero prior experience needed — covers the editor, navigation, lighting, and launching your first project from scratch.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Official</span>
+            <span class="chip">Epic Games</span>
+            <span class="chip">1 hr</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://docs.unrealengine.com/5.3/en-US/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+        <span class="card-step">02</span>
+        <div class="card-top">
+          <span class="card-title">Unreal Engine 5 Documentation</span>
+          <span class="badge badge-all">All Levels</span>
+        </div>
+        <p class="card-desc">The complete reference for every UE5 feature — editor, rendering, physics, audio, networking. Set it as a browser bookmark before you need it.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Reference</span>
+            <span class="chip">Epic Games</span>
+            <span class="chip">Always current</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://dev.epicgames.com/community/learning"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+        <span class="card-step">03</span>
+        <div class="card-top">
+          <span class="card-title">Unreal Online Learning</span>
+          <span class="badge badge-all">All Levels</span>
+        </div>
+        <p class="card-desc">Epic's free structured course hub. Blueprints, Lumen, Nanite, MetaHuman, animation, multiplayer — built and maintained by the people who made the engine.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Courses</span>
+            <span class="chip">Epic Games</span>
+            <span class="chip">Self-paced</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/@UnrealEngine"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+        <span class="card-step">04</span>
+        <div class="card-top">
+          <span class="card-title">Unreal Engine YouTube Channel</span>
+          <span class="badge badge-beginner">Beginner</span>
+        </div>
+        <p class="card-desc">Official tutorials, Unreal Fest talks, and feature deep dives. Start with the Getting Started playlist, then follow your interest into rendering, gameplay, or tools.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Video</span>
+            <span class="chip">YouTube</span>
+            <span class="chip">Official</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://docs.unrealengine.com/5.3/en-US/blueprints-visual-scripting-in-unreal-engine/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+        <span class="card-step">05</span>
+        <div class="card-top">
+          <span class="card-title">Blueprint Visual Scripting</span>
+          <span class="badge badge-beginner">Beginner</span>
+        </div>
+        <p class="card-desc">The complete Blueprint reference. Build full games without writing C++ — event graphs, functions, macros, interfaces, and data-driven design patterns.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Blueprints</span>
+            <span class="chip">Official</span>
+            <span class="chip">Epic Games</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://forums.unrealengine.com/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+        <span class="card-step">06</span>
+        <div class="card-top">
+          <span class="card-title">Unreal Engine Forums</span>
+          <span class="badge badge-all">All Levels</span>
+        </div>
+        <p class="card-desc">The official community. Post problems, read deep dives, track engine updates from the core team. One of the best technical game dev forums anywhere online.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Community</span>
+            <span class="chip">Forums</span>
+            <span class="chip">Official</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+    </div>
+  </div><!-- /section-learn -->
+
+  <!-- SECTION: BUILD -->
+  <div id="section-build">
+    <div class="sub-header">
+      <span class="sub-pill pill-build">Build</span>
+      <span class="sub-title">C++ · Assets · Community</span>
+      <span class="sub-count">6 resources</span>
+    </div>
+
+    <div class="card-grid">
+
+      <a href="https://docs.unrealengine.com/5.3/en-US/programming-with-cplusplus-in-unreal-engine/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+        <span class="card-step">01</span>
+        <div class="card-top">
+          <span class="card-title">C++ in Unreal Engine — Official Docs</span>
+          <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        <p class="card-desc">Official C++ programming guide. Actors, Components, the reflection/UCLASS system, gameplay framework. For developers who want direct control of the engine.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Official</span>
+            <span class="chip">C++</span>
+            <span class="chip">Epic Games</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://unrealcpp.com/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+        <span class="card-step">02</span>
+        <div class="card-top">
+          <span class="card-title">UnrealCPP.com</span>
+          <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        <p class="card-desc">Community-built C++ snippet library for Unreal. Timers, delegates, interfaces, game modes — every entry is a complete, tested working example you can drop in immediately.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Community</span>
+            <span class="chip">C++</span>
+            <span class="chip">Snippets</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://www.tomlooman.com/unreal-engine-cpp-guide/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+        <span class="card-step">03</span>
+        <div class="card-top">
+          <span class="card-title">Tom Looman — UE C++ Guide</span>
+          <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        <p class="card-desc">Written by a former Epic developer. Gameplay Ability System, data-driven design, best practices, and architecture patterns. One of the best non-official UE resources anywhere.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Expert</span>
+            <span class="chip">C++</span>
+            <span class="chip">Deep Dive</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://www.fab.com/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+        <span class="card-step">04</span>
+        <div class="card-top">
+          <span class="card-title">Fab.com — Free Assets</span>
+          <span class="badge badge-all">All Levels</span>
+        </div>
+        <p class="card-desc">Epic's official asset marketplace. Thousands of free environments, characters, audio packs, and materials. Filter by Free and start building without touching your budget.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Assets</span>
+            <span class="chip">Marketplace</span>
+            <span class="chip">Epic Games</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://quixel.com/megascans/home"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+        <span class="card-step">05</span>
+        <div class="card-top">
+          <span class="card-title">Quixel Megascans</span>
+          <span class="badge badge-all">All Levels</span>
+        </div>
+        <p class="card-desc">Free photorealistic surface and object scans for UE5. Every rock, terrain, wall, and material library entry was scanned from real-world reference. Instant production quality.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Assets</span>
+            <span class="chip">Quixel</span>
+            <span class="chip">Photorealistic</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/@VirtusEdu"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+        <span class="card-step">06</span>
+        <div class="card-top">
+          <span class="card-title">Virtus Learning Hub</span>
+          <span class="badge badge-beginner">Beginner</span>
+        </div>
+        <p class="card-desc">One of the most-watched free Unreal YouTube channels. Full project walkthroughs — empty scene to complete playable level. Great for seeing how real projects get built end to end.</p>
+        <div class="card-meta-row">
+          <div class="meta-chips">
+            <span class="chip chip-free">Free</span>
+            <span class="chip">Video</span>
+            <span class="chip">YouTube</span>
+            <span class="chip">Projects</span>
+          </div>
+          <span class="card-open">Open →</span>
+        </div>
+      </a>
+
+    </div>
+  </div><!-- /section-build -->
+
+  <!-- DIVIDER -->
+  <hr class="full-divider">
+
+  <!-- INTERACTIVE DEMO BANNER -->
+  <div class="demo-banner">
+    <div class="demo-left">
+      <p class="demo-tag">// Interactive Demo</p>
+      <p class="demo-title">TERRAIN_∞</p>
+      <p class="demo-desc">An infinite procedural landscape running in-browser — wireframe terrain, aurora sky, procedural noise generation. The same principles that power Unreal's world partition and terrain system, distilled to raw canvas.</p>
+    </div>
+    <a href="landscape.html" class="demo-link">Launch Experience →</a>
+  </div>
+
+</main>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  <span class="footer-brand">Nico's Codex</span>
+  <div class="footer-right">
+    <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
+    <span class="footer-date">Updated April 2026</span>
+    <span class="footer-tagline">Every resource is 100% free</span>
+  </div>
+</footer>
+
+</body>
+</html>
