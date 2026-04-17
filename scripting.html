@@ -5,389 +5,282 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scripting — Nico's Codex</title>
 <meta name="description" content="Curated scripting resources for IT pros and developers — PowerShell, Bash, Python, and automation. Free. No paywalls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & TOKENS ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
 
 :root {
-  --bg:        #0a0a0a;
-  --bg2:       #111111;
-  --bg3:       #171717;
-  --accent:    #b8f53c;
-  --accent-d:  #7aab1e;
-  --accent-gl: rgba(184,245,60,0.10);
-  --border:    #1e1e1e;
-  --border-hi: #2a2a2a;
-  --text:      #d4d4d4;
-  --text-hi:   #f0f0f0;
-  --muted:     #666666;
-  --dim:       #333333;
-  --mono:      'Courier New', Courier, monospace;
-  --serif:     Georgia, 'Times New Roman', serif;
-  --t-sys:     #b8f53c;
-  --t-err:     #ff5555;
-  --t-info:    #57c7ff;
-  --t-warn:    #f4c842;
+  --bg:         #000a1e;
+  --bg2:        #040f2a;
+  --bg3:        #081838;
+  --blue:       #4e8dff;
+  --blue-d:     #1a3a7a;
+  --blue-g:     rgba(78,141,255,0.18);
+  --blue-s:     rgba(78,141,255,0.07);
+  --purple:     #9966ff;
+  --purp-s:     rgba(153,102,255,0.07);
+  --silver:     #b4c8e8;
+  --silver-d:   #5a6a8a;
+  --border:     #132040;
+  --border-hi:  #223570;
+  --sans:       -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --mono:       'Share Tech Mono', 'Courier New', monospace;
+  /* PS2 button colors */
+  --btn-x:      #5a8fff;
+  --btn-o:      #ff4a4a;
+  --btn-sq:     #ff82c8;
+  --btn-tr:     #4aff88;
+  /* terminal */
+  --t-sys:      #4e8dff;
+  --t-err:      #ff4a4a;
+  --t-info:     #b4c8e8;
+  --t-warn:     #9966ff;
 }
 
-/* ── BASE ─────────────────────────────────────────────────────── */
-body {
+html, body {
+  min-height: 100%;
   background: var(--bg);
-  color: var(--text);
-  font-family: var(--serif);
+  color: var(--silver);
+  font-family: var(--sans);
   font-size: 1rem;
   line-height: 1.65;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
+  padding-bottom: 3rem; /* room above button bar */
 }
 
-/* ── STICKY HEADER ────────────────────────────────────────────── */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.7rem 1.5rem;
-  background: rgba(10,10,10,0.96);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(6px);
+/* ── WAVE CANVAS (fixed backdrop) ────────────────────────────── */
+#waves {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
 }
-.brand {
-  font-family: var(--mono);
-  font-size: 0.88rem;
-  font-weight: bold;
-  color: var(--accent);
-  letter-spacing: 0.02em;
+
+/* ── SCANLINES ────────────────────────────────────────────────── */
+.scanlines {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom, transparent 0px, transparent 3px,
+    rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
+  );
 }
-.brand:hover { opacity: 0.8; }
-.header-rule {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  letter-spacing: 0.06em;
+
+/* ── PS2 HEADER BAR ───────────────────────────────────────────── */
+.ps2-header {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 3rem;
+  background: rgba(0,8,25,0.97);
+  border-bottom: 1px solid var(--border-hi);
+}
+.ps2-header::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  opacity: 0.5;
+}
+.ps2-back {
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(78,141,255,0.5);
+  transition: color 0.15s;
+}
+.ps2-back:hover { color: var(--blue); }
+.ps2-brand {
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 0.88rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--silver);
+  text-shadow: 0 0 12px rgba(78,141,255,0.4);
+}
+.ps2-sector {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em;
+  color: var(--silver-d); text-transform: uppercase;
 }
 
 /* ── BREADCRUMB ───────────────────────────────────────────────── */
 .breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  position: relative; z-index: 10;
+  display: flex; align-items: center; gap: 0.45rem;
   padding: 0.55rem 1.5rem;
   border-bottom: 1px solid var(--border);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--muted);
+  font-family: var(--mono); font-size: 0.68rem; color: var(--silver-d);
+  background: rgba(0,8,22,0.8);
 }
-.breadcrumb a { color: var(--muted); transition: color 0.12s; }
-.breadcrumb a:hover { color: var(--accent); }
-.bc-sep { color: var(--dim); }
-.bc-cur { color: var(--text); }
+.breadcrumb a { color: var(--silver-d); transition: color 0.12s; }
+.breadcrumb a:hover { color: var(--blue); }
+.bc-sep { color: var(--border-hi); }
+.bc-cur { color: var(--silver); }
 
 /* ── PAGE WRAPPER ─────────────────────────────────────────────── */
 .page-wrap {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  flex: 1;
+  position: relative; z-index: 10;
+  max-width: 980px; margin: 0 auto; padding: 0 1.5rem;
 }
 
 /* ── HERO ─────────────────────────────────────────────────────── */
-.hero { padding: 3rem 0 2.25rem; }
+.hero { padding: 2.75rem 0 2rem; }
 .sector-label {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.3em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 0.8rem;
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.3em;
+  color: rgba(78,141,255,0.45); text-transform: uppercase; margin-bottom: 0.75rem;
 }
-.hero h1 {
-  font-family: var(--mono);
-  font-size: clamp(1.85rem, 4vw, 2.8rem);
-  font-weight: bold;
-  color: var(--text-hi);
-  margin-bottom: 1rem;
-  line-height: 1.1;
+.hero-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 10px var(--blue), 0 0 28px var(--blue-g);
+  margin-bottom: 0.8rem; line-height: 1;
 }
-.hero h1 .hl { color: var(--accent); }
 .hero-sub {
-  font-size: 0.9375rem;
-  color: var(--muted);
-  max-width: 600px;
-  line-height: 1.75;
+  font-size: 0.9rem; color: var(--silver-d); max-width: 580px; line-height: 1.75;
 }
 
-/* ── SUBSECTION HEADER ────────────────────────────────────────── */
-.sub-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 2.25rem 0 1rem;
+/* ── SECTION JUMP NAV ─────────────────────────────────────────── */
+.section-nav {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0 0 1.75rem; border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
-.sub-pill {
-  font-family: var(--mono);
-  font-size: 0.63rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: 2px;
-  white-space: nowrap;
-  border: 1px solid;
+.section-nav-label {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em;
+  color: var(--border-hi); text-transform: uppercase; margin-right: 0.2rem;
 }
-.pill-it  { background: rgba(34,211,238,0.07); color: #22d3ee; border-color: rgba(34,211,238,0.25); }
-.pill-dev { background: rgba(167,139,250,0.07); color: #a78bfa; border-color: rgba(167,139,250,0.25); }
+.snav-btn {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.05em;
+  color: var(--silver-d); padding: 4px 12px;
+  border: 1px solid var(--border-hi);
+  transition: color 0.14s, border-color 0.14s, background 0.14s;
+}
+.snav-btn:hover { color: var(--blue); border-color: var(--blue); background: var(--blue-s); }
+.snav-sep { color: var(--border-hi); font-size: 0.7rem; }
+
+/* ── SECTION HEADER ───────────────────────────────────────────── */
+.sub-header {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 2.5rem 0 1.1rem; flex-wrap: wrap;
+}
+.sub-pill {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 3px 10px; border: 1px solid; white-space: nowrap;
+}
+.pill-it  { color: var(--blue);   border-color: rgba(78,141,255,0.4); background: var(--blue-s); }
+.pill-dev { color: var(--purple); border-color: rgba(153,102,255,0.4); background: var(--purp-s); }
+
 .sub-title {
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  color: var(--text);
-  letter-spacing: 0.03em;
-  flex: 1;
+  font-family: var(--mono); font-size: 0.8rem; color: var(--silver);
+  letter-spacing: 0.04em; flex: 1;
 }
 .sub-count {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  white-space: nowrap;
+  font-family: var(--mono); font-size: 0.65rem; color: var(--silver-d); white-space: nowrap;
 }
 
 /* ── CARD GRID ────────────────────────────────────────────────── */
 .card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.875rem;
-  margin-bottom: 1rem;
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 0.9rem; margin-bottom: 0.5rem;
 }
 
 /* ── RESOURCE CARD ────────────────────────────────────────────── */
 .r-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 0.85rem 1rem 0.75rem;
-  transition: border-color 0.14s, transform 0.14s;
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  animation: fadeUp 0.35s ease forwards;
+  display: flex; flex-direction: column;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 0; position: relative; overflow: hidden;
+  opacity: 0; animation: cardIn 0.35s ease forwards;
+  transition: border-color 0.16s, background 0.16s, transform 0.16s;
 }
-.r-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-d), transparent);
-  opacity: 0;
-  transition: opacity 0.14s;
+
+/* Colored top stripe */
+.r-card .card-stripe {
+  height: 2px; width: 100%;
+  flex-shrink: 0;
 }
-.r-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-.r-card:hover::after { opacity: 1; }
-@keyframes fadeUp {
+.card-stripe-it  { background: linear-gradient(90deg, var(--blue-d), var(--blue), var(--blue-d)); }
+.card-stripe-dev { background: linear-gradient(90deg, #4a2a8a, var(--purple), #4a2a8a); }
+
+.r-card .card-inner { padding: 0.85rem 1rem 0.78rem; display: flex; flex-direction: column; flex: 1; }
+
+.r-card:hover { border-color: var(--border-hi); background: var(--bg3); transform: translateY(-2px); }
+
+/* IT card hover: blue glow */
+.section-it-cards .r-card:hover { border-color: rgba(78,141,255,0.4); }
+/* Dev card hover: purple glow */
+.section-dev-cards .r-card:hover { border-color: rgba(153,102,255,0.4); }
+
+@keyframes cardIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── STEP NUMBER ──────────────────────────────────────────────── */
-.card-step {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  color: var(--dim);
-  letter-spacing: 0.12em;
-  margin-bottom: 0.4rem;
-  display: block;
-}
+.card-step { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.2em; color: var(--border-hi); margin-bottom: 0.4rem; display: block; }
+.card-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.card-title { font-family: var(--mono); font-size: 0.78rem; color: #d8e8ff; line-height: 1.4; flex: 1; }
 
-/* card top: title + badge */
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.55rem;
-}
-.card-title {
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  color: var(--text-hi);
-  line-height: 1.4;
-  flex: 1;
-}
-
-/* ── LEVEL BADGES ─────────────────────────────────────────────── */
-.badge {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
-  padding: 2px 6px;
-  border: 1px solid;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
-  border-radius: 1px;
-}
-.badge-beginner     { color: #4ade80; border-color: rgba(74,222,128,0.35); }
-.badge-intermediate { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
-.badge-advanced     { color: #f472b6; border-color: rgba(244,114,182,0.35); }
-.badge-all          { color: var(--accent); border-color: rgba(184,245,60,0.35); }
+.badge { font-family: var(--mono); font-size: 0.56rem; letter-spacing: 0.08em; padding: 2px 6px; border: 1px solid; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+.badge-beginner     { color: #4aff88; border-color: rgba(74,255,136,0.3); }
+.badge-intermediate { color: #5a8fff; border-color: rgba(90,143,255,0.3); }
+.badge-advanced     { color: #ff82c8; border-color: rgba(255,130,200,0.3); }
+.badge-all          { color: var(--silver); border-color: var(--border-hi); }
 
 .card-desc {
-  font-size: 0.79rem;
-  color: var(--muted);
-  line-height: 1.62;
-  flex: 1;
-  margin-bottom: 0.75rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 0.8rem; color: var(--silver-d); line-height: 1.65;
+  flex: 1; margin-bottom: 0.72rem;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 
-/* ── TABS ─────────────────────────────────────────────────────── */
-.tab-bar {
-  display: flex;
-  border-bottom: 1px solid var(--border-hi);
-  margin-bottom: 0;
-}
-.tab-btn {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 0.6rem 1.25rem;
-  color: var(--muted);
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  transition: color 0.12s, border-color 0.12s;
-  margin-bottom: -1px;
-}
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-btn:hover:not(.active) { color: var(--text); }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* ── TERMINAL LAUNCH ──────────────────────────────────────────── */
-.terminal-launch-btn {
-  width: 100%;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  padding: 0.75rem 1.1rem;
-  background: var(--bg2);
-  border: 1px solid var(--border-hi);
-  color: var(--muted);
-  cursor: pointer;
-  text-align: left;
-  letter-spacing: 0.06em;
-  transition: color 0.12s, border-color 0.12s;
-  margin-bottom: 0;
-}
-.terminal-launch-btn:hover { color: var(--accent); border-color: var(--accent); }
-.terminal-collapsed { display: none; }
-
-/* meta row */
 .card-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-  padding-top: 0.6rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.4rem; padding-top: 0.58rem;
   border-top: 1px solid var(--border);
-  margin-top: auto;
-  flex-wrap: wrap;
+  margin-top: auto; flex-wrap: wrap;
 }
-.meta-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.chip {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  padding: 2px 6px;
-  border: 1px solid var(--border-hi);
-  color: var(--muted);
-  white-space: nowrap;
-  border-radius: 1px;
-}
-.chip-free { color: #4ade80; border-color: rgba(74,222,128,0.3); }
-.card-open {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  white-space: nowrap;
-  transition: color 0.12s;
-  flex-shrink: 0;
-}
-.r-card:hover .card-open { color: var(--accent); }
+.meta-chips { display: flex; flex-wrap: wrap; gap: 0.28rem; }
+.chip { font-family: var(--mono); font-size: 0.58rem; padding: 2px 6px; border: 1px solid var(--border-hi); color: var(--silver-d); white-space: nowrap; }
+.chip-free { color: var(--btn-tr); border-color: rgba(74,255,136,0.25); }
+.card-open { font-family: var(--mono); font-size: 0.65rem; color: var(--silver-d); white-space: nowrap; transition: color 0.14s; flex-shrink: 0; }
+.section-it-cards .r-card:hover .card-open  { color: var(--blue); }
+.section-dev-cards .r-card:hover .card-open { color: var(--purple); }
 
-/* ── FULL-WIDTH DIVIDER ───────────────────────────────────────── */
+/* ── SECTION DIVIDER ──────────────────────────────────────────── */
 .full-divider {
-  border: none;
-  border-top: 1px solid var(--border-hi);
-  margin: 3rem 0 2.5rem;
+  border: none; border-top: 1px solid var(--border-hi); margin: 3rem 0 2.5rem;
 }
 
 /* ── TERMINAL INTRO ───────────────────────────────────────────── */
 .terminal-intro { padding-bottom: 1.25rem; }
 .terminal-intro-label {
-  font-family: var(--mono);
-  font-size: 0.63rem;
-  letter-spacing: 0.32em;
-  color: var(--accent);
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.32em;
+  color: var(--blue); text-transform: uppercase; margin-bottom: 0.5rem;
 }
 .terminal-intro h2 {
-  font-family: var(--mono);
-  font-size: 1.25rem;
-  color: var(--text-hi);
-  margin-bottom: 0.6rem;
-  line-height: 1.3;
+  font-family: 'Orbitron', sans-serif; font-size: 1.2rem; letter-spacing: 0.06em;
+  color: #fff; margin-bottom: 0.6rem; line-height: 1.2;
+  text-shadow: 0 0 10px var(--blue-g);
 }
-.terminal-intro h2 .hl { color: var(--accent); }
-.terminal-intro p {
-  font-size: 0.88rem;
-  color: var(--muted);
-  max-width: 620px;
-  line-height: 1.75;
-}
+.terminal-intro h2 .hl { color: var(--blue); }
+.terminal-intro p { font-size: 0.88rem; color: var(--silver-d); max-width: 620px; line-height: 1.75; }
 
 /* ── TERMINAL GAME ────────────────────────────────────────────── */
 .codex-terminal {
-  background: var(--bg2);
-  border: 1px solid var(--border-hi);
-  margin-bottom: 3rem;
-  font-family: var(--mono);
+  background: var(--bg2); border: 1px solid var(--border-hi);
+  margin-bottom: 3rem; font-family: var(--mono);
 }
 .terminal-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  display: flex; align-items: center; gap: 0.45rem;
   padding: 0.5rem 0.9rem;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg3); border-bottom: 1px solid var(--border);
   user-select: none;
 }
 .t-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.t-dot-r { background: #ff5f57; }
-.t-dot-y { background: #febc2e; }
-.t-dot-g { background: #28c840; }
-.terminal-title {
-  font-size: 0.68rem;
-  color: var(--muted);
-  letter-spacing: 0.07em;
-  margin-left: 0.2rem;
-}
+.t-dot-r { background: var(--btn-o); }
+.t-dot-y { background: var(--btn-sq); }
+.t-dot-g { background: var(--btn-tr); }
+.terminal-title { font-size: 0.66rem; color: var(--silver-d); letter-spacing: 0.07em; margin-left: 0.2rem; }
+
 .terminal-output {
-  height: 400px;
-  overflow-y: auto;
-  padding: 1rem 1.1rem;
-  scroll-behavior: smooth;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.55;
+  height: 400px; overflow-y: auto; padding: 1rem 1.1rem;
+  scroll-behavior: smooth; white-space: pre-wrap; word-break: break-word; line-height: 1.55;
 }
 .terminal-output::-webkit-scrollbar { width: 4px; }
 .terminal-output::-webkit-scrollbar-track { background: transparent; }
@@ -397,155 +290,109 @@ body {
 .t-err  { color: var(--t-err); }
 .t-info { color: var(--t-info); }
 .t-warn { color: var(--t-warn); }
-.t-dim  { color: var(--muted); }
-.t-cmd  { color: var(--text); }
+.t-dim  { color: var(--silver-d); }
+.t-cmd  { color: var(--silver); }
 
 .terminal-input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.1rem; border-top: 1px solid var(--border);
 }
-.t-prompt {
-  font-family: var(--mono);
-  font-size: 0.77rem;
-  color: var(--accent);
-  white-space: nowrap;
-  user-select: none;
-  flex-shrink: 0;
-}
+.t-prompt { font-family: var(--mono); font-size: 0.77rem; color: var(--blue); white-space: nowrap; user-select: none; flex-shrink: 0; }
 #t-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: var(--mono);
-  font-size: 0.77rem;
-  color: var(--text-hi);
-  caret-color: var(--accent);
+  flex: 1; background: transparent; border: none; outline: none;
+  font-family: var(--mono); font-size: 0.77rem; color: #fff; caret-color: var(--blue);
 }
+
 .t-btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border-top: 1px solid var(--border);
-  min-height: 2.4rem;
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  padding: 0.55rem 1.1rem; border-top: 1px solid var(--border); min-height: 2.4rem;
 }
 .t-btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 4px 10px;
-  background: transparent;
-  border: 1px solid var(--border-hi);
-  color: var(--muted);
-  cursor: pointer;
-  letter-spacing: 0.04em;
+  font-family: var(--mono); font-size: 0.66rem; padding: 4px 10px;
+  background: transparent; border: 1px solid var(--border-hi);
+  color: var(--silver-d); cursor: pointer; letter-spacing: 0.04em;
   transition: border-color 0.1s, color 0.1s, background 0.1s;
-  border-radius: 1px;
 }
-.t-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-gl); }
+.t-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-s); }
 
 /* ── SITE FOOTER ──────────────────────────────────────────────── */
 .site-footer {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 1.4rem 1.5rem;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 1.4rem 0; border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: 0.75rem;
 }
-.footer-brand {
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  color: var(--accent);
-  font-weight: bold;
-}
-.footer-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.2rem;
-}
-.footer-nav a {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  color: var(--muted);
-  transition: color 0.12s;
-}
-.footer-nav a:hover { color: var(--accent); }
-.footer-date {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  color: var(--dim);
-}
-.footer-tagline {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  color: var(--dim);
-}
+.footer-brand { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--blue); letter-spacing: 0.06em; }
+.footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+.footer-nav a { font-family: var(--mono); font-size: 0.7rem; color: var(--silver-d); transition: color 0.12s; }
+.footer-nav a:hover { color: var(--blue); }
+.footer-date { font-family: var(--mono); font-size: 0.6rem; color: var(--border-hi); }
+.footer-tagline { font-family: var(--mono); font-size: 0.6rem; color: var(--border-hi); }
 
-/* ── SECTION JUMP NAV ────────────────────────────────────────── */
-.section-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 0 1.5rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
-  flex-wrap: wrap;
+/* ── PS2 BUTTON BAR ───────────────────────────────────────────── */
+.ps2-btn-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.8rem; flex-wrap: wrap;
+  padding: 0.55rem 1.5rem;
+  background: rgba(0,8,22,0.97);
+  border-top: 1px solid var(--border-hi);
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.08em;
+  color: var(--silver-d);
 }
-.section-nav-label {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--dim);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-right: 0.25rem;
+.ps2-btn-bar::before {
+  content: '';
+  position: absolute; top: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue-d), transparent);
+  opacity: 0.6;
 }
-.snav-btn {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-  text-decoration: none;
-  padding: 4px 12px;
+.btn-hint { display: flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
+.ps2-sym {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; border-radius: 50%;
+  border: 1.5px solid; font-size: 0.6rem; flex-shrink: 0;
+  line-height: 1;
+}
+.sym-x  { color: var(--btn-x);  border-color: var(--btn-x); }
+.sym-o  { color: var(--btn-o);  border-color: var(--btn-o); }
+.sym-sq { color: var(--btn-sq); border-color: var(--btn-sq); }
+.sym-tr { color: var(--btn-tr); border-color: var(--btn-tr); }
+.ps2-key {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 15px; padding: 0 3px;
   border: 1px solid var(--border-hi);
-  border-radius: 1px;
-  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  font-size: 0.58rem; color: var(--silver-d); flex-shrink: 0;
 }
-.snav-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-gl); }
-.snav-sep { color: var(--dim); font-family: var(--mono); font-size: 0.7rem; }
 
 /* ── RESPONSIVE ───────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .page-wrap   { padding: 0 1rem; }
-  .site-header { padding: 0.6rem 1rem; }
-  .header-rule { display: none; }
-  .breadcrumb  { padding: 0.5rem 1rem; font-size: 0.65rem; }
-  .hero        { padding: 2rem 0 1.5rem; }
-  .card-grid   { grid-template-columns: 1fr; }
+  .page-wrap { padding: 0 1rem; }
+  .ps2-header { padding: 0 1rem; }
+  .breadcrumb { padding: 0.5rem 1rem; }
+  .hero { padding: 2rem 0 1.5rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .ps2-btn-bar { gap: 1rem; font-size: 0.55rem; }
+  .btn-hint:nth-child(n+4) { display: none; }
 }
 @media (min-width: 601px) and (max-width: 860px) {
-  .card-grid   { grid-template-columns: repeat(2, 1fr); }
+  .card-grid { grid-template-columns: repeat(2,1fr); }
   .terminal-output { height: 300px; }
-  .full-divider { margin: 2rem 0 1.75rem; }
-  .sub-header { padding: 1.5rem 0 0.75rem; gap: 0.5rem; }
-  .site-footer { padding: 1.1rem 1rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- ── STICKY HEADER ──────────────────────────────────────────── -->
-<header class="site-header">
-  <a href="index.html" class="brand">Nico's Codex</a>
-  <span class="header-rule">Rule 78 — Knowledge is free</span>
+<!-- Wave canvas backdrop -->
+<canvas id="waves"></canvas>
+<div class="scanlines"></div>
+
+<!-- PS2-STYLE HEADER BAR -->
+<header class="ps2-header">
+  <a href="index.html" class="ps2-back">← Back</a>
+  <span class="ps2-brand">Nico's Codex</span>
+  <span class="ps2-sector">Sector_03</span>
 </header>
 
-<!-- ── BREADCRUMB ─────────────────────────────────────────────── -->
+<!-- BREADCRUMB -->
 <nav class="breadcrumb" aria-label="breadcrumb">
   <a href="index.html">← All Sectors</a>
   <span class="bc-sep">/</span>
@@ -554,17 +401,17 @@ body {
   <span class="bc-cur">Scripting</span>
 </nav>
 
-<!-- ── MAIN ───────────────────────────────────────────────────── -->
+<!-- MAIN -->
 <main class="page-wrap">
 
   <!-- HERO -->
   <section class="hero">
-    <p class="sector-label">03 / All Levels</p>
-    <h1># <span class="hl">Scripting</span></h1>
+    <p class="sector-label">// sector_03 · all levels</p>
+    <h1 class="hero-title">Scripting</h1>
     <p class="hero-sub">Curated resources for IT pros and developers. PowerShell, Bash, Python, and automation — from your first cmdlet to production-grade scripts. Everything here is free.</p>
   </section>
 
-  <!-- ── SECTION JUMP NAV ──────────────────────────────────── -->
+  <!-- SECTION JUMP NAV -->
   <nav class="section-nav" aria-label="Jump to section">
     <span class="section-nav-label">Jump to:</span>
     <a href="#section-it"  class="snav-btn">IT / MSP — PowerShell &amp; Bash</a>
@@ -572,315 +419,339 @@ body {
     <a href="#section-dev" class="snav-btn">Dev — Python &amp; Automation</a>
   </nav>
 
-  <!-- ── SECTION: IT / MSP ────────────────────────────────── -->
+  <!-- ── SECTION: IT / MSP ──────────────────────────────────── -->
   <div id="section-it">
-  <div class="sub-header">
-    <span class="sub-pill pill-it">IT / MSP</span>
-    <span class="sub-title">PowerShell · Bash · RMM Automation</span>
-    <span class="sub-count">6 resources</span>
-  </div>
+    <div class="sub-header">
+      <span class="sub-pill pill-it">IT / MSP</span>
+      <span class="sub-title">PowerShell · Bash · RMM Automation</span>
+      <span class="sub-count">6 resources</span>
+    </div>
 
-  <div class="card-grid">
+    <div class="card-grid section-it-cards">
 
-    <!-- Card 1 -->
-    <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/00-introduction"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
-      <span class="card-step">01</span>
-      <div class="card-top">
-        <span class="card-title">PowerShell 101 — Microsoft Learn</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">Microsoft's official PowerShell intro for IT pros. Covers pipeline, cmdlets, objects, remoting, and scripting fundamentals — core MSP skills.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Self-paced</span>
-          <span class="chip">Microsoft</span>
-          <span class="chip">PowerShell</span>
+      <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/00-introduction"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">01</span>
+          <div class="card-top">
+            <span class="card-title">PowerShell 101 — Microsoft Learn</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">Microsoft's official PowerShell intro for IT pros. Covers pipeline, cmdlets, objects, remoting, and scripting fundamentals — core MSP skills.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Self-paced</span>
+              <span class="chip">Microsoft</span>
+              <span class="chip">PowerShell</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 2 -->
-    <a href="https://learn.microsoft.com/en-us/training/paths/powershell/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
-      <span class="card-step">02</span>
-      <div class="card-top">
-        <span class="card-title">PowerShell Learning Path — Microsoft Learn</span>
-        <span class="badge badge-intermediate">Intermediate</span>
-      </div>
-      <p class="card-desc">Structured path: automation patterns, error handling, Active Directory, registry, file system. Earns a Microsoft badge on completion.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Modules</span>
-          <span class="chip">Badge on completion</span>
-          <span class="chip">Microsoft</span>
+      <a href="https://learn.microsoft.com/en-us/training/paths/powershell/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">02</span>
+          <div class="card-top">
+            <span class="card-title">PowerShell Learning Path — Microsoft Learn</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+          <p class="card-desc">Structured path: automation patterns, error handling, Active Directory, registry, file system. Earns a Microsoft badge on completion.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Modules</span>
+              <span class="chip">Badge on completion</span>
+              <span class="chip">Microsoft</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 3 -->
-    <a href="https://ss64.com/ps/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
-      <span class="card-step">03</span>
-      <div class="card-top">
-        <span class="card-title">SS64 PowerShell Reference</span>
-        <span class="badge badge-all">All Levels</span>
-      </div>
-      <p class="card-desc">The fastest PowerShell command reference on the internet. Every cmdlet, every parameter. Bookmark it now.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Reference</span>
-          <span class="chip">Always current</span>
+      <a href="https://ss64.com/ps/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">03</span>
+          <div class="card-top">
+            <span class="card-title">SS64 PowerShell Reference</span>
+            <span class="badge badge-all">All Levels</span>
+          </div>
+          <p class="card-desc">The fastest PowerShell command reference on the internet. Every cmdlet, every parameter. Bookmark it now.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Reference</span>
+              <span class="chip">Always current</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 4 -->
-    <a href="https://www.learnshell.org/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
-      <span class="card-step">04</span>
-      <div class="card-top">
-        <span class="card-title">LearnShell.org — Interactive Bash</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">Browser-based Bash lessons with zero setup. Variables, loops, functions, piping. The right starting point for macOS and Linux endpoint scripts.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Interactive</span>
-          <span class="chip">In-browser</span>
-          <span class="chip">Bash</span>
+      <a href="https://www.learnshell.org/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">04</span>
+          <div class="card-top">
+            <span class="card-title">LearnShell.org — Interactive Bash</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">Browser-based Bash lessons with zero setup. Variables, loops, functions, piping. The right starting point for macOS and Linux endpoint scripts.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Interactive</span>
+              <span class="chip">In-browser</span>
+              <span class="chip">Bash</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 5 -->
-    <a href="https://github.com/dattoInc/datto-rmm-scripts"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
-      <span class="card-step">05</span>
-      <div class="card-top">
-        <span class="card-title">Datto RMM Community Scripts — GitHub</span>
-        <span class="badge badge-intermediate">Intermediate</span>
-      </div>
-      <p class="card-desc">Community PowerShell scripts for Datto RMM: deployment, monitoring, and endpoint management used by MSPs in production.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Open Source</span>
-          <span class="chip">Datto RMM</span>
-          <span class="chip">PowerShell</span>
+      <a href="https://github.com/dattoInc/datto-rmm-scripts"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">05</span>
+          <div class="card-top">
+            <span class="card-title">Datto RMM Community Scripts — GitHub</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+          <p class="card-desc">Community PowerShell scripts for Datto RMM: deployment, monitoring, and endpoint management used by MSPs in production.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Open Source</span>
+              <span class="chip">Datto RMM</span>
+              <span class="chip">PowerShell</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 6 -->
-    <a href="https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
-      <span class="card-step">06</span>
-      <div class="card-top">
-        <span class="card-title">PowerShell in VS Code — Official Guide</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">Set up VS Code as a PowerShell IDE: IntelliSense, integrated terminal, PSScriptAnalyzer linter. Stop using Notepad.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Setup Guide</span>
-          <span class="chip">Microsoft</span>
+      <a href="https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+        <div class="card-stripe card-stripe-it"></div>
+        <div class="card-inner">
+          <span class="card-step">06</span>
+          <div class="card-top">
+            <span class="card-title">PowerShell in VS Code — Official Guide</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">Set up VS Code as a PowerShell IDE: IntelliSense, integrated terminal, PSScriptAnalyzer linter. Stop using Notepad.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Setup Guide</span>
+              <span class="chip">Microsoft</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-  </div><!-- /card-grid IT -->
-  </div><!-- /tab-panel it -->
+    </div>
+  </div><!-- /section-it -->
 
-  <!-- ── SECTION: DEV ──────────────────────────────────────── -->
+  <!-- ── SECTION: DEV ────────────────────────────────────────── -->
   <div id="section-dev">
-  <div class="sub-header">
-    <span class="sub-pill pill-dev">Dev</span>
-    <span class="sub-title">Python · JavaScript · Automation</span>
-    <span class="sub-count">6 resources</span>
-  </div>
+    <div class="sub-header">
+      <span class="sub-pill pill-dev">Dev</span>
+      <span class="sub-title">Python · JavaScript · Automation</span>
+      <span class="sub-count">6 resources</span>
+    </div>
 
-  <div class="card-grid">
+    <div class="card-grid section-dev-cards">
 
-    <!-- Card 7 -->
-    <a href="https://automatetheboringstuff.com/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
-      <span class="card-step">01</span>
-      <div class="card-top">
-        <span class="card-title">Automate the Boring Stuff with Python</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">The best free Python scripting book. File automation, spreadsheets, PDFs, web scraping, scheduled tasks. Read free online in full.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Full book online</span>
-          <span class="chip">Python</span>
-          <span class="chip">Al Sweigart</span>
+      <a href="https://automatetheboringstuff.com/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">01</span>
+          <div class="card-top">
+            <span class="card-title">Automate the Boring Stuff with Python</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">The best free Python scripting book. File automation, spreadsheets, PDFs, web scraping, scheduled tasks. Read free online in full.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Full book online</span>
+              <span class="chip">Python</span>
+              <span class="chip">Al Sweigart</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 8 -->
-    <a href="https://realpython.com/tutorials/scripting/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
-      <span class="card-step">02</span>
-      <div class="card-top">
-        <span class="card-title">Real Python — Scripting Tutorials</span>
-        <span class="badge badge-intermediate">Intermediate</span>
-      </div>
-      <p class="card-desc">CLI tools, file I/O, subprocess, cron, API automation. For people who know some Python but want to script effectively.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Article series</span>
-          <span class="chip">Python</span>
+      <a href="https://realpython.com/tutorials/scripting/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">02</span>
+          <div class="card-top">
+            <span class="card-title">Real Python — Scripting Tutorials</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+          <p class="card-desc">CLI tools, file I/O, subprocess, cron, API automation. For people who know some Python but want to script effectively.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Article series</span>
+              <span class="chip">Python</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 9 -->
-    <a href="https://javascript.info/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
-      <span class="card-step">03</span>
-      <div class="card-top">
-        <span class="card-title">The Modern JavaScript Tutorial</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">The most comprehensive free JS resource. Covers Node.js scripting, async/await, modules, and automation tooling end-to-end.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">javascript.info</span>
-          <span class="chip">JavaScript</span>
+      <a href="https://javascript.info/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">03</span>
+          <div class="card-top">
+            <span class="card-title">The Modern JavaScript Tutorial</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">The most comprehensive free JS resource. Covers Node.js scripting, async/await, modules, and automation tooling end-to-end.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">javascript.info</span>
+              <span class="chip">JavaScript</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 10 -->
-    <a href="https://n8n.io/blog/learn-to-automate/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
-      <span class="card-step">04</span>
-      <div class="card-top">
-        <span class="card-title">n8n — Learn to Automate</span>
-        <span class="badge badge-all">All Levels</span>
-      </div>
-      <p class="card-desc">Open-source workflow automation. Webhooks, API chaining, scheduling, event triggers. Self-hostable alternative to Zapier.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Open Source</span>
-          <span class="chip">Automation</span>
-          <span class="chip">n8n</span>
+      <a href="https://n8n.io/blog/learn-to-automate/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">04</span>
+          <div class="card-top">
+            <span class="card-title">n8n — Learn to Automate</span>
+            <span class="badge badge-all">All Levels</span>
+          </div>
+          <p class="card-desc">Open-source workflow automation. Webhooks, API chaining, scheduling, event triggers. Self-hostable alternative to Zapier.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Open Source</span>
+              <span class="chip">Automation</span>
+              <span class="chip">n8n</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 11 -->
-    <a href="https://docs.python.org/3/library/argparse.html"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
-      <span class="card-step">05</span>
-      <div class="card-top">
-        <span class="card-title">Python argparse — Official Docs</span>
-        <span class="badge badge-intermediate">Intermediate</span>
-      </div>
-      <p class="card-desc">Standard library for building real CLI tools. Makes your scripts reusable and shareable with other people and other machines.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Official Docs</span>
-          <span class="chip">Python</span>
-          <span class="chip">CLI</span>
+      <a href="https://docs.python.org/3/library/argparse.html"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">05</span>
+          <div class="card-top">
+            <span class="card-title">Python argparse — Official Docs</span>
+            <span class="badge badge-intermediate">Intermediate</span>
+          </div>
+          <p class="card-desc">Standard library for building real CLI tools. Makes your scripts reusable and shareable with other people and other machines.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Official Docs</span>
+              <span class="chip">Python</span>
+              <span class="chip">CLI</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-    <!-- Card 12 -->
-    <a href="https://www.freecodecamp.org/news/bash-scripting-tutorial-linux-shell-script-and-command-line-for-beginners/"
-       target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
-      <span class="card-step">06</span>
-      <div class="card-top">
-        <span class="card-title">Bash Scripting Full Course — freeCodeCamp</span>
-        <span class="badge badge-beginner">Beginner</span>
-      </div>
-      <p class="card-desc">Complete Bash guide: variables, conditionals, loops, functions, cron jobs. Solid foundation for building real automation pipelines.</p>
-      <div class="card-meta-row">
-        <div class="meta-chips">
-          <span class="chip chip-free">Free</span>
-          <span class="chip">Full course</span>
-          <span class="chip">freeCodeCamp</span>
-          <span class="chip">Bash</span>
+      <a href="https://www.freecodecamp.org/news/bash-scripting-tutorial-linux-shell-script-and-command-line-for-beginners/"
+         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+        <div class="card-stripe card-stripe-dev"></div>
+        <div class="card-inner">
+          <span class="card-step">06</span>
+          <div class="card-top">
+            <span class="card-title">Bash Scripting Full Course — freeCodeCamp</span>
+            <span class="badge badge-beginner">Beginner</span>
+          </div>
+          <p class="card-desc">Complete Bash guide: variables, conditionals, loops, functions, cron jobs. Solid foundation for building real automation pipelines.</p>
+          <div class="card-meta-row">
+            <div class="meta-chips">
+              <span class="chip chip-free">Free</span>
+              <span class="chip">Full course</span>
+              <span class="chip">freeCodeCamp</span>
+              <span class="chip">Bash</span>
+            </div>
+            <span class="card-open">Open →</span>
+          </div>
         </div>
-        <span class="card-open">Open →</span>
-      </div>
-    </a>
+      </a>
 
-  </div><!-- /card-grid Dev -->
-  </div><!-- /tab-panel dev -->
+    </div>
+  </div><!-- /section-dev -->
 
-  <!-- ── FULL-WIDTH DIVIDER ──────────────────────────────────── -->
+  <!-- DIVIDER -->
   <hr class="full-divider">
 
-  <!-- ── TERMINAL INTRO ────────────────────────────────────────  -->
+  <!-- TERMINAL INTRO -->
   <section class="terminal-intro">
     <p class="terminal-intro-label">Mission Terminal</p>
     <h2>CODEX_OS <span class="hl">v2.4.1</span></h2>
     <p>A text-based operative environment embedded directly in the Codex. Navigate two network sectors, neutralise threats, and extract data assets. No setup required — fully playable in-browser with keyboard or the buttons below.</p>
   </section>
 
-  <!-- ── TERMINAL GAME ─────────────────────────────────────────  -->
+  <!-- TERMINAL GAME -->
   <div class="codex-terminal" id="codex-terminal">
-
-    <!-- Fake OS titlebar -->
     <div class="terminal-bar">
       <span class="t-dot t-dot-r"></span>
       <span class="t-dot t-dot-y"></span>
       <span class="t-dot t-dot-g"></span>
       <span class="terminal-title">CODEX_OS v2.4.1 — operative session</span>
     </div>
-
-    <!-- Scrollable output -->
     <div class="terminal-output" id="t-output" aria-live="polite" aria-label="Terminal output"></div>
-
-    <!-- Input row -->
     <div class="terminal-input-row">
       <span class="t-prompt">guest@codex:~$</span>
       <input id="t-input" type="text" autocomplete="off" autocorrect="off"
              autocapitalize="off" spellcheck="false" aria-label="Terminal input">
     </div>
-
-    <!-- Clickable option buttons -->
     <div class="t-btn-row" id="t-btn-row"></div>
+  </div>
 
-  </div><!-- /codex-terminal -->
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <span class="footer-brand">Nico's Codex</span>
+    <div class="footer-right">
+      <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
+      <span class="footer-date">Updated April 2026</span>
+      <span class="footer-tagline">Every resource is 100% free</span>
+    </div>
+  </footer>
 
 </main>
 
-<!-- ── SITE FOOTER ─────────────────────────────────────────────── -->
-<footer class="site-footer">
-  <span class="footer-brand">Nico's Codex</span>
-  <div class="footer-right">
-    <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
-    <span class="footer-date">Updated April 2026</span>
-    <span class="footer-tagline">Every resource is 100% free</span>
-  </div>
-</footer>
+<!-- PS2 CONTROLLER BUTTON BAR -->
+<div class="ps2-btn-bar" aria-hidden="true">
+  <span class="btn-hint"><span class="ps2-sym sym-x">✕</span> Open resource</span>
+  <span class="btn-hint"><span class="ps2-sym sym-o">○</span> Back</span>
+  <span class="btn-hint"><span class="ps2-key">↑↓</span> Scroll</span>
+  <span class="btn-hint"><span class="ps2-key">↵</span> Terminal input</span>
+  <span class="btn-hint"><span class="ps2-sym sym-tr">△</span> Jump to section</span>
+</div>
 
 <!-- ── TERMINAL GAME LOGIC ────────────────────────────────────── -->
 <script>
@@ -1458,7 +1329,71 @@ body {
   inp.focus();
 
 }());
-
 </script>
+
+<!-- ── PS2 WAVE BACKGROUND ────────────────────────────────────── -->
+<script>
+(function () {
+'use strict';
+
+const cv  = document.getElementById('waves');
+const ctx = cv.getContext('2d');
+let W, H, t = 0;
+
+const RIBBONS = [
+  { r: 78,  g: 141, b: 255, yR: 0.08, amp: 60,  freq: 0.0028, phase: 0.0,  spd: 0.38, alpha: 0.20, w: 1.8 },
+  { r: 153, g: 102, b: 255, yR: 0.22, amp: 50,  freq: 0.0022, phase: 1.3,  spd: 0.28, alpha: 0.15, w: 1.5 },
+  { r: 74,  g: 255, b: 136, yR: 0.44, amp: 42,  freq: 0.0034, phase: 2.5,  spd: 0.44, alpha: 0.11, w: 1.4 },
+  { r: 255, g: 74,  b: 74,  yR: 0.66, amp: 55,  freq: 0.0030, phase: 3.7,  spd: 0.32, alpha: 0.13, w: 1.5 },
+  { r: 56,  g: 200, b: 232, yR: 0.85, amp: 38,  freq: 0.0038, phase: 4.9,  spd: 0.40, alpha: 0.09, w: 1.2 },
+  { r: 255, g: 130, b: 200, yR: 0.35, amp: 30,  freq: 0.0018, phase: 1.8,  spd: 0.22, alpha: 0.07, w: 1.2 },
+];
+
+function resize() {
+  W = cv.width  = window.innerWidth;
+  H = cv.height = window.innerHeight;
+}
+
+function draw(ts) {
+  t = ts * 0.001;
+  ctx.clearRect(0, 0, W, H);
+
+  for (const rib of RIBBONS) {
+    const baseY = H * rib.yR;
+
+    /* thin glowing line */
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 6) {
+      const y = baseY
+        + Math.sin(x * rib.freq + t * rib.spd + rib.phase) * rib.amp
+        + Math.sin(x * rib.freq * 0.52 + t * rib.spd * 0.7) * (rib.amp * 0.28);
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(${rib.r},${rib.g},${rib.b},${rib.alpha})`;
+    ctx.lineWidth = rib.w;
+    ctx.stroke();
+
+    /* soft glow pass */
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 6) {
+      const y = baseY
+        + Math.sin(x * rib.freq + t * rib.spd + rib.phase) * rib.amp
+        + Math.sin(x * rib.freq * 0.52 + t * rib.spd * 0.7) * (rib.amp * 0.28);
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(${rib.r},${rib.g},${rib.b},${rib.alpha * 0.25})`;
+    ctx.lineWidth = rib.w * 5;
+    ctx.stroke();
+  }
+
+  requestAnimationFrame(draw);
+}
+
+resize();
+window.addEventListener('resize', resize);
+requestAnimationFrame(draw);
+}());
+</script>
+
 </body>
 </html>
