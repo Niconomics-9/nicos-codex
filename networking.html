@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nico's Codex — Networking</title>
+<meta name="description" content="Nico's Codex: Networking — A curated resource hub for computer networks, protocols, certifications, and hands-on labs.">
+<meta property="og:title" content="Nico's Codex — Networking">
+<meta property="og:description" content="Fundamentals · Protocols · Certs · Labs">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #05050f;
+    --cyan:        #3bc9f5;
+    --cyan-dim:    #1a6a82;
+    --cyan-glow:   rgba(59, 201, 245, 0.28);
+    --cyan-subtle: rgba(59, 201, 245, 0.05);
+    --cyan-mid:    rgba(59, 201, 245, 0.12);
+    --muted:       rgba(59, 201, 245, 0.4);
+    --border:      rgba(59, 201, 245, 0.18);
+    --topbar-h:    48px;
+    --footer-h:    40px;
+    --menu-w:      260px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 0, 0, 0.14) 3px,
+      rgba(0, 0, 0, 0.14) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── TOP BAR ─────────────────────────────── */
+  .topbar {
+    height: var(--topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5, 5, 15, 0.96);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .back-link {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--cyan); }
+
+  .topbar-sep {
+    color: var(--border);
+    font-size: 0.75rem;
+  }
+
+  .topbar-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.45rem;
+    letter-spacing: 0.1em;
+    color: var(--cyan);
+    text-shadow: 0 0 14px var(--cyan-glow);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+  }
+
+  .topbar-sector { color: var(--muted); }
+
+  .topbar-status { color: var(--muted); }
+  .topbar-status::before {
+    content: '●';
+    margin-right: 0.35em;
+    color: var(--cyan);
+    animation: pulse-dot 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* ── MAIN LAYOUT ────────────────────────── */
+  .layout {
+    display: flex;
+    height: calc(100vh - var(--topbar-h) - var(--footer-h));
+    overflow: hidden;
+  }
+
+  /* ── LEFT MENU PANEL ────────────────────── */
+  .menu-panel {
+    width: var(--menu-w);
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 1.5rem 0;
+    scrollbar-width: none;
+  }
+  .menu-panel::-webkit-scrollbar { display: none; }
+
+  .menu-header {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 1.25rem 1.1rem;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.25rem;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
+  }
+  .menu-item:hover { background: rgba(59, 201, 245, 0.05); }
+  .menu-item.active {
+    border-left-color: var(--cyan);
+    background: var(--cyan-mid);
+  }
+
+  .menu-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    min-width: 18px;
+    transition: color 0.12s;
+  }
+  .menu-item.active .menu-num { color: var(--cyan); }
+
+  .menu-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex: 1;
+    transition: color 0.12s;
+  }
+  .menu-item.active .menu-label,
+  .menu-item:hover   .menu-label { color: var(--cyan); }
+
+  .menu-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    color: var(--cyan-dim);
+    flex-shrink: 0;
+    transition: color 0.12s;
+  }
+  .menu-item.active .menu-count { color: var(--muted); }
+
+  .menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.4rem 1.25rem 0.4rem;
+  }
+
+  /* ── RIGHT CONTENT PANEL ───────────────── */
+  .content-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 2.5rem 2.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--cyan-dim) transparent;
+  }
+  .content-panel::-webkit-scrollbar { width: 3px; }
+  .content-panel::-webkit-scrollbar-track { background: transparent; }
+  .content-panel::-webkit-scrollbar-thumb { background: var(--cyan-dim); }
+
+  .section         { display: none; }
+  .section.active  { display: block; }
+
+  .section-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.63rem;
+    letter-spacing: 0.22em;
+    color: var(--cyan);
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+    letter-spacing: 0.05em;
+    color: var(--cyan);
+    text-shadow: 0 0 18px var(--cyan-glow);
+    line-height: 1;
+    margin-bottom: 0.55rem;
+  }
+
+  .section-subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    line-height: 1.6;
+    margin-bottom: 1.75rem;
+    max-width: 560px;
+  }
+
+  /* ── RESOURCE CARDS ────────────────────── */
+  .res-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .res-card {
+    display: flex;
+    min-height: 76px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--border);
+    background: var(--cyan-subtle);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.14s, border-color 0.14s;
+  }
+
+  .res-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--cyan);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.2s ease;
+    z-index: 1;
+  }
+
+  .res-card:hover {
+    background: rgba(59, 201, 245, 0.09);
+    border-color: rgba(59, 201, 245, 0.38);
+  }
+  .res-card:hover::before { transform: scaleY(1); }
+
+  /* Left type bar */
+  .res-type-bar {
+    width: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 201, 245, 0.06);
+    border-right: 1px solid var(--border);
+  }
+
+  .res-type-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.16em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  /* Card body */
+  .res-body {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.22rem;
+    min-width: 0;
+  }
+
+  .res-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .res-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.63rem;
+    color: var(--muted);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .res-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--cyan-dim);
+    letter-spacing: 0.06em;
+    margin-top: 0.08rem;
+  }
+
+  /* Right arrow */
+  .res-arrow {
+    width: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: var(--muted);
+    transition: transform 0.15s, color 0.15s;
+  }
+  .res-card:hover .res-arrow {
+    transform: translateX(4px);
+    color: var(--cyan);
+  }
+
+  /* Locked placeholder cards */
+  .res-card.locked {
+    opacity: 0.3;
+    border-style: dashed;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  /* ── FOOTER KEYBIND BAR ─────────────────── */
+  .keybind-bar {
+    height: var(--footer-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    border-top: 1px solid var(--border);
+    background: rgba(5, 5, 15, 0.96);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .keybind {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 17px;
+    padding: 0 4px;
+    border: 1px solid var(--border);
+    background: rgba(59, 201, 245, 0.05);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--cyan);
+    letter-spacing: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-link">← CODEX</a>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-title">Networking</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-sector">SECTOR_02</span>
+    <span class="topbar-status">ONLINE</span>
+  </div>
+</header>
+
+<!-- Main layout -->
+<div class="layout">
+
+  <!-- Left menu panel -->
+  <nav class="menu-panel" id="menuPanel">
+    <p class="menu-header">// Sections</p>
+
+    <div class="menu-item active" data-index="0">
+      <span class="menu-num">01</span>
+      <span class="menu-label">Fundamentals</span>
+      <span class="menu-count">4 RES</span>
+    </div>
+
+    <div class="menu-item" data-index="1">
+      <span class="menu-num">02</span>
+      <span class="menu-label">Protocols</span>
+      <span class="menu-count">4 RES</span>
+    </div>
+
+    <div class="menu-item" data-index="2">
+      <span class="menu-num">03</span>
+      <span class="menu-label">Certs &amp; Careers</span>
+      <span class="menu-count">3 RES</span>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-item" data-index="3">
+      <span class="menu-num">04</span>
+      <span class="menu-label">Labs &amp; Practice</span>
+      <span class="menu-count">3 RES</span>
+    </div>
+  </nav>
+
+  <!-- Right content panel -->
+  <main class="content-panel" id="contentPanel">
+
+    <!-- ── Section 01 — Fundamentals ── -->
+    <div class="section active" id="section-0">
+      <p class="section-eyebrow">// Section 01 — Beginner</p>
+      <h2 class="section-title">Fundamentals</h2>
+      <p class="section-subtitle">What a network is, how data moves, and the building blocks every IT professional needs locked in.</p>
+
+      <div class="res-stack">
+
+        <a href="https://www.youtube.com/watch?v=qiQR5rTSshw" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Video</span></div>
+          <div class="res-body">
+            <p class="res-name">Computer Networking Full Course — FreeCodeCamp</p>
+            <p class="res-desc">9-hour beginner deep dive: OSI model, TCP/IP, DNS, DHCP, subnetting, switching, routing.</p>
+            <p class="res-meta">Free · YouTube · ~9 hrs</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.professormesser.com/network-plus/n10-008/n10-008-video/n10-008-training-course/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Course</span></div>
+          <div class="res-body">
+            <p class="res-name">Professor Messer — CompTIA Network+</p>
+            <p class="res-desc">Free structured video series covering every Network+ objective. Industry standard for cert prep.</p>
+            <p class="res-meta">Free · professormesser.com · self-paced</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.cloudflare.com/learning/network-layer/what-is-the-network-layer/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Docs</span></div>
+          <div class="res-body">
+            <p class="res-name">Cloudflare Learning Center — Networking</p>
+            <p class="res-desc">Plain-English breakdowns of OSI layers, routing, DNS, firewalls, VPNs. Bookmark-worthy reference.</p>
+            <p class="res-meta">Free · cloudflare.com · reference</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.subnet-calculator.com/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Tool</span></div>
+          <div class="res-body">
+            <p class="res-name">Subnet Calculator</p>
+            <p class="res-desc">Paste any IP/CIDR and instantly get the network range, broadcast, usable hosts, and wildcard mask.</p>
+            <p class="res-meta">Free · subnet-calculator.com · instant</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Section 02 — Protocols ── -->
+    <div class="section" id="section-1">
+      <p class="section-eyebrow">// Section 02 — Intermediate</p>
+      <h2 class="section-title">Protocols</h2>
+      <p class="section-subtitle">Go deeper — understand how traffic actually flows, what tools capture it, and why protocols behave the way they do.</p>
+
+      <div class="res-stack">
+
+        <a href="https://www.wireshark.org/docs/wsug_html_chunked/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Docs</span></div>
+          <div class="res-body">
+            <p class="res-name">Wireshark User's Guide</p>
+            <p class="res-desc">Capture and analyze live traffic at the packet level. The essential tool for understanding networks.</p>
+            <p class="res-meta">Free · wireshark.org · self-paced</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://hpbn.co/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Read</span></div>
+          <div class="res-body">
+            <p class="res-name">High Performance Browser Networking</p>
+            <p class="res-desc">Free online book by an ex-Google engineer. Deep dives into TCP, UDP, TLS, HTTP/1.1, HTTP/2, HTTP/3, and WebSockets from a performance angle.</p>
+            <p class="res-meta">Free · hpbn.co · self-paced</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://beej.us/guide/bgnet/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Guide</span></div>
+          <div class="res-body">
+            <p class="res-name">Beej's Guide to Network Programming</p>
+            <p class="res-desc">The classic free guide to sockets and network programming. TCP/UDP, client-server models, and raw packet handling explained from first principles.</p>
+            <p class="res-meta">Free · beej.us · reference</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.rfc-editor.org/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Docs</span></div>
+          <div class="res-body">
+            <p class="res-name">RFC Editor</p>
+            <p class="res-desc">The source of truth for every internet protocol — TCP, DNS, HTTP, TLS, and hundreds more. Search any RFC and read the actual spec.</p>
+            <p class="res-meta">Free · rfc-editor.org · reference</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Section 03 — Certs & Careers ── -->
+    <div class="section" id="section-2">
+      <p class="section-eyebrow">// Section 03 — Intermediate</p>
+      <h2 class="section-title">Certs &amp; Careers</h2>
+      <p class="section-subtitle">Map your path to professional certification and the roles that networking knowledge unlocks.</p>
+
+      <div class="res-stack">
+
+        <a href="https://www.comptia.org/training/resources/exam-objectives" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Docs</span></div>
+          <div class="res-body">
+            <p class="res-name">CompTIA Network+ Exam Objectives (N10-009)</p>
+            <p class="res-desc">The official exam blueprint. Free PDF — shows exactly what's tested, how domains are weighted, and what skills each objective maps to.</p>
+            <p class="res-meta">Free · comptia.org · PDF download</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.examcompass.com/comptia/network-plus-certification/free-network-plus-practice-tests" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Quiz</span></div>
+          <div class="res-body">
+            <p class="res-name">ExamCompass — Network+ Practice Tests</p>
+            <p class="res-desc">Free, no-login practice exams with answer explanations. Use after studying to find gaps before sitting the real cert.</p>
+            <p class="res-meta">Free · examcompass.com · self-paced</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://learningnetwork.cisco.com/s/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Course</span></div>
+          <div class="res-body">
+            <p class="res-name">Cisco Learning Network</p>
+            <p class="res-desc">Official free Cisco study hub with community forums, learning paths, and prep resources for CCNA and beyond. No subscription needed for community content.</p>
+            <p class="res-meta">Free · learningnetwork.cisco.com · self-paced</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Section 04 — Labs & Practice ── -->
+    <div class="section" id="section-3">
+      <p class="section-eyebrow">// Section 04 — All Levels</p>
+      <h2 class="section-title">Labs &amp; Practice</h2>
+      <p class="section-subtitle">Get hands-on. Simulators, virtual labs, and practice environments to drill what you've learned until it sticks.</p>
+
+      <div class="res-stack">
+
+        <a href="https://www.gns3.com/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Sim</span></div>
+          <div class="res-body">
+            <p class="res-name">GNS3 — Network Simulator</p>
+            <p class="res-desc">Free open-source simulator. Build full virtual topologies with real router and switch images, configure everything, and break things safely.</p>
+            <p class="res-meta">Free · gns3.com · desktop app</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://www.netacad.com/cisco-packet-tracer" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Sim</span></div>
+          <div class="res-body">
+            <p class="res-name">Cisco Packet Tracer</p>
+            <p class="res-desc">Cisco's free drag-and-drop network simulator. Configure routers, switches, and end devices, then watch packets trace their routes in real time.</p>
+            <p class="res-meta">Free · netacad.com · free account required</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+        <a href="https://subnettingpractice.com/" target="_blank" class="res-card">
+          <div class="res-type-bar"><span class="res-type-label">Drill</span></div>
+          <div class="res-body">
+            <p class="res-name">SubnettingPractice.com</p>
+            <p class="res-desc">Instant randomized subnetting drills. Practice CIDR notation, wildcard masks, and host calculations until the math is automatic.</p>
+            <p class="res-meta">Free · subnettingpractice.com · instant</p>
+          </div>
+          <div class="res-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer keybind bar -->
+<footer class="keybind-bar">
+  <span class="keybind"><span class="key">↑</span><span class="key">↓</span> Navigate</span>
+  <span class="keybind"><span class="key">↵</span> Select</span>
+</footer>
+
+<script>
+  const menuItems = document.querySelectorAll('.menu-item');
+  const sections  = document.querySelectorAll('.section');
+  const content   = document.getElementById('contentPanel');
+  let activeIndex = 0;
+
+  function activateSection(index) {
+    menuItems.forEach((item, i) => item.classList.toggle('active', i === index));
+    sections.forEach((sec,  i) => sec.classList.toggle('active',  i === index));
+    activeIndex = index;
+    content.scrollTop = 0;
+  }
+
+  menuItems.forEach((item, index) => {
+    item.addEventListener('click', () => activateSection(index));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activateSection(Math.max(0, activeIndex - 1));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activateSection(Math.min(menuItems.length - 1, activeIndex + 1));
+    }
+  });
+</script>
+</body>
+</html>
