@@ -160,7 +160,7 @@ body {
 /* ── CARD GRID ────────────────────────────────────────────────── */
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.875rem;
   margin-bottom: 1rem;
 }
@@ -191,6 +191,16 @@ body {
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── STEP NUMBER ──────────────────────────────────────────────── */
+.card-step {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.4rem;
+  display: block;
 }
 
 /* card top: title + badge */
@@ -439,6 +449,9 @@ body {
   .breadcrumb  { padding: 0.5rem 1rem; font-size: 0.65rem; }
   .hero        { padding: 2rem 0 1.5rem; }
   .card-grid   { grid-template-columns: 1fr; }
+}
+@media (min-width: 601px) and (max-width: 860px) {
+  .card-grid   { grid-template-columns: repeat(2, 1fr); }
   .terminal-output { height: 300px; }
   .full-divider { margin: 2rem 0 1.75rem; }
   .sub-header { padding: 1.5rem 0 0.75rem; gap: 0.5rem; }
@@ -450,15 +463,15 @@ body {
 
 <!-- ── STICKY HEADER ──────────────────────────────────────────── -->
 <header class="site-header">
-  <a href="/" class="brand">Nico's Codex</a>
+  <a href="index.html" class="brand">Nico's Codex</a>
   <span class="header-rule">Rule 78 — Knowledge is free</span>
 </header>
 
 <!-- ── BREADCRUMB ─────────────────────────────────────────────── -->
 <nav class="breadcrumb" aria-label="breadcrumb">
-  <a href="/">← All Sectors</a>
+  <a href="index.html">← All Sectors</a>
   <span class="bc-sep">/</span>
-  <span>Sector_02</span>
+  <span>Sector_03</span>
   <span class="bc-sep">/</span>
   <span class="bc-cur">Scripting</span>
 </nav>
@@ -468,7 +481,7 @@ body {
 
   <!-- HERO -->
   <section class="hero">
-    <p class="sector-label">02 / All Levels</p>
+    <p class="sector-label">03 / All Levels</p>
     <h1># <span class="hl">Scripting</span></h1>
     <p class="hero-sub">Curated resources for IT pros and developers. PowerShell, Bash, Python, and automation — from your first cmdlet to production-grade scripts. Everything here is free.</p>
   </section>
@@ -485,6 +498,7 @@ body {
     <!-- Card 1 -->
     <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/00-introduction"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+      <span class="card-step">01</span>
       <div class="card-top">
         <span class="card-title">PowerShell 101 — Microsoft Learn</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -504,6 +518,7 @@ body {
     <!-- Card 2 -->
     <a href="https://learn.microsoft.com/en-us/training/paths/powershell/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+      <span class="card-step">02</span>
       <div class="card-top">
         <span class="card-title">PowerShell Learning Path — Microsoft Learn</span>
         <span class="badge badge-intermediate">Intermediate</span>
@@ -523,6 +538,7 @@ body {
     <!-- Card 3 -->
     <a href="https://ss64.com/ps/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+      <span class="card-step">03</span>
       <div class="card-top">
         <span class="card-title">SS64 PowerShell Reference</span>
         <span class="badge badge-all">All Levels</span>
@@ -541,6 +557,7 @@ body {
     <!-- Card 4 -->
     <a href="https://www.learnshell.org/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+      <span class="card-step">04</span>
       <div class="card-top">
         <span class="card-title">LearnShell.org — Interactive Bash</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -560,6 +577,7 @@ body {
     <!-- Card 5 -->
     <a href="https://github.com/dattoInc/datto-rmm-scripts"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+      <span class="card-step">05</span>
       <div class="card-top">
         <span class="card-title">Datto RMM Community Scripts — GitHub</span>
         <span class="badge badge-intermediate">Intermediate</span>
@@ -579,6 +597,7 @@ body {
     <!-- Card 6 -->
     <a href="https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+      <span class="card-step">06</span>
       <div class="card-top">
         <span class="card-title">PowerShell in VS Code — Official Guide</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -608,6 +627,7 @@ body {
     <!-- Card 7 -->
     <a href="https://automatetheboringstuff.com/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+      <span class="card-step">01</span>
       <div class="card-top">
         <span class="card-title">Automate the Boring Stuff with Python</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -627,6 +647,7 @@ body {
     <!-- Card 8 -->
     <a href="https://realpython.com/tutorials/scripting/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+      <span class="card-step">02</span>
       <div class="card-top">
         <span class="card-title">Real Python — Scripting Tutorials</span>
         <span class="badge badge-intermediate">Intermediate</span>
@@ -645,6 +666,7 @@ body {
     <!-- Card 9 -->
     <a href="https://javascript.info/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+      <span class="card-step">03</span>
       <div class="card-top">
         <span class="card-title">The Modern JavaScript Tutorial</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -663,6 +685,7 @@ body {
     <!-- Card 10 -->
     <a href="https://n8n.io/blog/learn-to-automate/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+      <span class="card-step">04</span>
       <div class="card-top">
         <span class="card-title">n8n — Learn to Automate</span>
         <span class="badge badge-all">All Levels</span>
@@ -682,6 +705,7 @@ body {
     <!-- Card 11 -->
     <a href="https://docs.python.org/3/library/argparse.html"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+      <span class="card-step">05</span>
       <div class="card-top">
         <span class="card-title">Python argparse — Official Docs</span>
         <span class="badge badge-intermediate">Intermediate</span>
@@ -701,6 +725,7 @@ body {
     <!-- Card 12 -->
     <a href="https://www.freecodecamp.org/news/bash-scripting-tutorial-linux-shell-script-and-command-line-for-beginners/"
        target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+      <span class="card-step">06</span>
       <div class="card-top">
         <span class="card-title">Bash Scripting Full Course — freeCodeCamp</span>
         <span class="badge badge-beginner">Beginner</span>
@@ -761,7 +786,7 @@ body {
 <footer class="site-footer">
   <span class="footer-brand">Nico's Codex</span>
   <div class="footer-right">
-    <nav class="footer-nav"><a href="/">← All Sectors</a></nav>
+    <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
     <span class="footer-date">Updated April 2026</span>
     <span class="footer-tagline">Every resource is 100% free</span>
   </div>
