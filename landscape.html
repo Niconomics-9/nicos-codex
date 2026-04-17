@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TERRAIN_∞ — Nico's Codex</title>
+<meta name="description" content="An infinite interactive wireframe landscape. Click for a new world.">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #000;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+canvas { display: block; position: fixed; inset: 0; z-index: 1; }
+
+.scanlines {
+  position: fixed; inset: 0; z-index: 8; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom, transparent 0px, transparent 3px,
+    rgba(0,0,0,0.11) 3px, rgba(0,0,0,0.11) 4px
+  );
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 9; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(0,0,0,0.72) 100%);
+}
+
+/* ── HUD ──────────────────────────────────────────────── */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.hud.visible { opacity: 1; }
+
+.hud-back {
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(184,245,60,0.45); text-decoration: none; transition: color 0.15s;
+}
+.hud-back:hover { color: #b8f53c; }
+.hud-logo {
+  font-size: 0.92rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: #b8f53c;
+  text-shadow: 0 0 16px rgba(184,245,60,0.6), 0 0 45px rgba(184,245,60,0.18);
+}
+.hud-right {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.12rem;
+}
+.hud-seed { font-size: 0.6rem; letter-spacing: 0.1em; color: rgba(184,245,60,0.32); }
+.hud-spd  { font-size: 0.56rem; letter-spacing: 0.08em; color: rgba(184,245,60,0.2); }
+
+.hints {
+  position: fixed; bottom: 1rem; left: 0; right: 0; z-index: 30;
+  display: flex; justify-content: center; gap: 1.4rem;
+  font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(184,245,60,0.2); pointer-events: none;
+  opacity: 0; transition: opacity 1.2s ease;
+}
+.hints.visible { opacity: 1; }
+.hkey {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 15px; padding: 0 3px;
+  border: 1px solid rgba(184,245,60,0.22);
+  font-size: 0.54rem; color: rgba(184,245,60,0.4);
+}
+
+/* ── BOOT SCREEN ──────────────────────────────────────── */
+.boot {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #000;
+  transition: opacity 0.9s ease;
+}
+.boot.fade-out { opacity: 0; pointer-events: none; }
+.boot.gone     { display: none; }
+
+.boot-brand {
+  font-size: 0.7rem; letter-spacing: 0.45em; text-transform: uppercase;
+  color: rgba(184,245,60,0.35); margin-bottom: 0.9rem;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+.boot-brand.show { opacity: 1; }
+
+.boot-title {
+  font-size: clamp(2.2rem, 7vw, 4.2rem);
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: #b8f53c;
+  text-shadow: 0 0 30px rgba(184,245,60,0.7), 0 0 80px rgba(184,245,60,0.25);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  margin-bottom: 0.5rem;
+}
+.boot-title.show { opacity: 1; transform: translateY(0); }
+
+.boot-sub {
+  font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(184,245,60,0.28); margin-bottom: 2.5rem;
+  opacity: 0; transition: opacity 0.6s ease 0.2s;
+}
+.boot-sub.show { opacity: 1; }
+
+.boot-bar-wrap {
+  width: min(320px, 70vw); height: 2px;
+  background: rgba(184,245,60,0.08); margin-bottom: 0.75rem;
+  overflow: hidden;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.boot-bar-wrap.show { opacity: 1; }
+.boot-bar {
+  height: 100%; width: 0; background: #b8f53c;
+  box-shadow: 0 0 8px rgba(184,245,60,0.8);
+  transition: width 2.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boot-status {
+  font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(184,245,60,0.28);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.boot-status.show { opacity: 1; }
+
+/* ── FLASH ──────────────────────────────────────────────── */
+.flash {
+  position: fixed; inset: 0; z-index: 20; pointer-events: none;
+  opacity: 0; background: rgba(184,245,60,0.045);
+}
+
+@media (max-width: 600px) {
+  .hud { padding: 0.65rem 1rem; }
+  .hud-logo { font-size: 0.78rem; letter-spacing: 0.22em; }
+  .hints { font-size: 0.5rem; gap: 0.9rem; }
+  .mobile-hide { display: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<header class="hud" id="hud">
+  <a href="index.html" class="hud-back">← All Sectors</a>
+  <span class="hud-logo">TERRAIN_∞</span>
+  <div class="hud-right">
+    <span class="hud-seed" id="hud-seed">SEED /////</span>
+    <span class="hud-spd"  id="hud-spd">SPD 1.0×</span>
+  </div>
+</header>
+
+<footer class="hints" id="hints">
+  <span class="mobile-hide">Move mouse — look</span>
+  <span class="mobile-hide" style="opacity:.4">·</span>
+  <span><span class="hkey">click</span> new world</span>
+  <span style="opacity:.4">·</span>
+  <span class="mobile-hide"><span class="hkey">scroll</span> speed</span>
+</footer>
+
+<!-- Boot screen -->
+<div class="boot" id="boot">
+  <p  class="boot-brand"  id="b-brand">Nico's Codex</p>
+  <h1 class="boot-title"  id="b-title">TERRAIN_∞</h1>
+  <p  class="boot-sub"    id="b-sub">interactive landscape generator</p>
+  <div class="boot-bar-wrap" id="b-bar-wrap">
+    <div class="boot-bar" id="b-bar"></div>
+  </div>
+  <p class="boot-status" id="b-status">Generating world…</p>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* ── CANVAS / DOM ──────────────────────────────────────────────── */
+const cv      = document.getElementById('c');
+const ctx     = cv.getContext('2d');
+const hudEl   = document.getElementById('hud');
+const hintsEl = document.getElementById('hints');
+const seedEl  = document.getElementById('hud-seed');
+const spdEl   = document.getElementById('hud-spd');
+const flashEl = document.getElementById('flash');
+const bootEl  = document.getElementById('boot');
+
+let W, H, HX, HY;
+function resize() {
+  W  = cv.width  = window.innerWidth;
+  H  = cv.height = window.innerHeight;
+  HX = W  / 2;
+  HY = Math.round(H * 0.44);
+}
+
+/* ── TERRAIN CONFIG ────────────────────────────────────────────── */
+const COLS    = 32;
+const ROWS    = 80;
+const CELL    = 80;
+const CAM_H   = 180;
+const FOV     = 570;
+const NEAR    = 52;
+const H_SC    = 175;
+const FOG_N   = 1500;
+const FOG_F   = 5800;
+
+/* ── STATE ─────────────────────────────────────────────────────── */
+let seed     = 0;
+let scrollZ  = 0;
+let speed    = 1.0;
+let tYaw     = 0, tPitch = 0;
+let yaw      = 0, pitch  = 0;
+let stars    = [];
+let hCache   = {};
+let particles= [];
+let time     = 0;
+
+/* ── NOISE ─────────────────────────────────────────────────────── */
+function h21(x, y) {
+  const n = Math.sin(x * 127.1 + y * 311.7 + seed * 0.41) * 43758.5453;
+  return n - Math.floor(n);
+}
+const smooth = t => t * t * (3 - 2 * t);
+const mix    = (a, b, t) => a + (b - a) * t;
+
+function vnoise(x, y) {
+  const ix = Math.floor(x), iy = Math.floor(y);
+  const ux = smooth(x - ix), uy = smooth(y - iy);
+  return mix(
+    mix(h21(ix,iy),   h21(ix+1,iy),   ux),
+    mix(h21(ix,iy+1), h21(ix+1,iy+1), ux),
+    uy
+  );
+}
+function fbm(x, y) {
+  let v = 0, a = 0.5, f = 1;
+  for (let i = 0; i < 6; i++) { v += vnoise(x*f, y*f)*a; a*=.5; f*=2.07; }
+  return Math.min(1, v * 1.03);
+}
+
+/* ── HEIGHT CACHE ──────────────────────────────────────────────── */
+function getRow(wr) {
+  if (hCache[wr]) return hCache[wr];
+  const row = new Float32Array(COLS + 1);
+  const FQ  = 0.046;
+  for (let c = 0; c <= COLS; c++) row[c] = fbm(c * FQ, wr * FQ * 0.62);
+  hCache[wr] = row;
+  delete hCache[wr - ROWS - 10];
+  return row;
+}
+
+/* ── STARS ─────────────────────────────────────────────────────── */
+function buildStars() {
+  stars = [];
+  for (let i = 0; i < 260; i++) {
+    stars.push({
+      nx: Math.random(), ny: Math.random() * 0.44,
+      r:  Math.random() * 1.6  + 0.22,
+      br: Math.random() * 0.52 + 0.25,
+      ph: Math.random() * 6.28,
+      twinkleSpeed: Math.random() * 0.8 + 0.4
+    });
+  }
+}
+
+/* ── PARTICLES ─────────────────────────────────────────────────── */
+function spawnParticle(sx, sy, h) {
+  if (particles.length > 55) return;
+  particles.push({
+    x: sx + (Math.random() - 0.5) * 12,
+    y: sy,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: -(Math.random() * 0.6 + 0.2),
+    life: 1.0,
+    decay: Math.random() * 0.008 + 0.005,
+    r: Math.random() * 2 + 1,
+    h
+  });
+}
+
+/* ── PROJECTION ────────────────────────────────────────────────── */
+function project(wx, wy, wz) {
+  const cY = Math.cos(yaw), sY = Math.sin(yaw);
+  const cP = Math.cos(pitch), sP = Math.sin(pitch);
+  const rx  =  wx * cY - wz * sY;
+  const rz1 =  wx * sY + wz * cY;
+  const ry  =  wy * cP - rz1 * sP;
+  const rz  =  wy * sP + rz1 * cP;
+  if (rz <= NEAR) return null;
+  const s = FOV / rz;
+  return { sx: HX + rx*s, sy: HY + ry*s, z: rz, s };
+}
+
+/* ── COLOUR ────────────────────────────────────────────────────── */
+function tColor(h, depth, alpha) {
+  let r, g, b;
+  if (h < 0.20) {
+    const t = h / 0.20;
+    r = Math.round(mix(12, 20,  t));
+    g = Math.round(mix(20, 120, t));
+    b = Math.round(mix(80, 210, t));
+  } else if (h < 0.48) {
+    const t = (h - 0.20) / 0.28;
+    r = Math.round(mix(20,  100, t));
+    g = Math.round(mix(120, 255, t));
+    b = Math.round(mix(210, 100, t));
+  } else if (h < 0.76) {
+    const t = (h - 0.48) / 0.28;
+    r = Math.round(mix(100, 184, t));
+    g = 255;
+    b = Math.round(mix(100, 55,  t));
+  } else {
+    const t = (h - 0.76) / 0.24;
+    r = Math.round(mix(184, 240, t));
+    g = Math.round(mix(245, 255, t));
+    b = Math.round(mix(55,  220, t));
+  }
+  r = Math.round(r * depth + 2  * (1-depth));
+  g = Math.round(g * depth + 8  * (1-depth));
+  b = Math.round(b * depth + 22 * (1-depth));
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* ── DRAW CELESTIAL ────────────────────────────────────────────── */
+function drawSky() {
+  /* Sky gradient */
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0,    '#00000c');
+  sky.addColorStop(0.28, '#010818');
+  sky.addColorStop(0.40, '#040d20');
+  sky.addColorStop(0.44, '#060f1a');
+  sky.addColorStop(1,    '#020c0e');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  /* Aurora bands */
+  const aColors = [
+    'rgba(80,40,180,0.032)',
+    'rgba(30,160,130,0.028)',
+    'rgba(60,80,220,0.025)',
+  ];
+  for (let b = 0; b < 3; b++) {
+    const baseY = H * (0.04 + b * 0.07);
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    for (let x = 0; x <= W; x += 18) {
+      const y = baseY
+        + Math.sin(x * 0.006 + time * (0.22 + b * 0.08)) * 28
+        + Math.sin(x * 0.003 + time * 0.14 + b * 1.7)     * 18;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+    ctx.fillStyle = aColors[b];
+    ctx.fill();
+  }
+
+  /* Stars */
+  for (const s of stars) {
+    const pulse = 0.52 + 0.48 * Math.sin(time * s.twinkleSpeed + s.ph);
+    ctx.beginPath();
+    ctx.arc(s.nx * W, s.ny * H, s.r, 0, 6.2832);
+    ctx.fillStyle = `rgba(200,220,255,${s.br * pulse})`;
+    ctx.fill();
+  }
+
+  /* Sun — slowly drifts */
+  const sunX = HX + Math.sin(time * 0.012) * W * 0.08;
+  const sunY = HY - 22;
+  const sunR = 38;
+
+  /* Outer corona glow */
+  const corona = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, W * 0.45);
+  corona.addColorStop(0,   'rgba(130,255,200,0.11)');
+  corona.addColorStop(0.12,'rgba(80,220,170,0.07)');
+  corona.addColorStop(0.35,'rgba(40,180,130,0.03)');
+  corona.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = corona;
+  ctx.fillRect(0, 0, W, H);
+
+  /* Mid glow ring */
+  const ring = ctx.createRadialGradient(sunX, sunY, sunR * 0.8, sunX, sunY, sunR * 4.5);
+  ring.addColorStop(0,  'rgba(160,255,210,0.22)');
+  ring.addColorStop(0.3,'rgba(100,240,180,0.08)');
+  ring.addColorStop(1,  'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR * 4.5, 0, 6.2832);
+  ctx.fillStyle = ring;
+  ctx.fill();
+
+  /* Core orb */
+  const orb = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
+  orb.addColorStop(0,   `rgba(230,255,245,${0.92 + 0.08 * Math.sin(time * 0.4)})`);
+  orb.addColorStop(0.25,'rgba(180,255,225,0.80)');
+  orb.addColorStop(0.55,'rgba(100,245,190,0.45)');
+  orb.addColorStop(1,   'rgba(40,180,140,0)');
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR, 0, 6.2832);
+  ctx.fillStyle = orb;
+  ctx.fill();
+
+  /* Horizon light band below sun */
+  const band = ctx.createLinearGradient(0, sunY - 5, 0, sunY + 90);
+  band.addColorStop(0,   'rgba(60,220,170,0.09)');
+  band.addColorStop(0.5, 'rgba(30,160,120,0.04)');
+  band.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = band;
+  ctx.fillRect(sunX - W * 0.38, sunY - 5, W * 0.76, 95);
+}
+
+/* ── RENDER LOOP ───────────────────────────────────────────────── */
+function render(ts) {
+  time    = ts * 0.001;
+  scrollZ += speed;
+  yaw     += (tYaw   - yaw)   * 0.05;
+  pitch   += (tPitch - pitch) * 0.05;
+
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+
+  const scrollRow = Math.floor(scrollZ / CELL);
+  const subOff    = scrollZ % CELL;
+  const offX      = -(COLS * CELL) / 2;
+
+  /* Pre-compute all projected vertices */
+  const verts = [];
+  for (let r = 0; r <= ROWS; r++) {
+    verts[r] = [];
+    const wr  = scrollRow + r;
+    const rh  = getRow(wr);
+    const wz  = r * CELL - subOff + NEAR;
+    for (let c = 0; c <= COLS; c++) {
+      const wx = offX + c * CELL;
+      const h  = rh[c];
+      const p  = project(wx, CAM_H - h * H_SC, wz);
+      verts[r][c] = p ? { sx: p.sx, sy: p.sy, z: p.z, h } : null;
+    }
+  }
+
+  /* Draw terrain back → front */
+  for (let r = ROWS - 1; r >= 0; r--) {
+    const wz    = r * CELL - subOff + NEAR;
+    if (wz <= 0) continue;
+    const fog   = Math.max(0, Math.min(1, (wz - FOG_N) / (FOG_F - FOG_N)));
+    const depth = 1 - fog;
+    if (depth < 0.01) continue;
+
+    /* Filled quads */
+    if (depth > 0.06) {
+      for (let c = 0; c < COLS; c++) {
+        const p00 = verts[r][c],     p10 = verts[r][c+1];
+        const p01 = verts[r+1]?.[c], p11 = verts[r+1]?.[c+1];
+        if (!p00 || !p10 || !p01 || !p11) continue;
+        const h = (p00.h + p10.h + p01.h + p11.h) * 0.25;
+        ctx.beginPath();
+        ctx.moveTo(p00.sx, p00.sy); ctx.lineTo(p10.sx, p10.sy);
+        ctx.lineTo(p11.sx, p11.sy); ctx.lineTo(p01.sx, p01.sy);
+        ctx.closePath();
+        ctx.fillStyle = tColor(h, depth, depth * 0.19);
+        ctx.fill();
+      }
+    }
+
+    /* Z-lines */
+    for (let c = 0; c <= COLS; c++) {
+      const p0 = verts[r][c], p1 = verts[r+1]?.[c];
+      if (!p0 || !p1) continue;
+      ctx.beginPath();
+      ctx.moveTo(p0.sx, p0.sy); ctx.lineTo(p1.sx, p1.sy);
+      ctx.strokeStyle = tColor(p0.h, depth, depth * (0.2 + p0.h * 0.5));
+      ctx.lineWidth   = Math.max(0.25, (0.28 + p0.h * 0.72) * depth);
+      ctx.stroke();
+    }
+
+    /* X-lines */
+    for (let c = 0; c < COLS; c++) {
+      const p0 = verts[r][c], p1 = verts[r][c+1];
+      if (!p0 || !p1) continue;
+      const h = (p0.h + p1.h) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(p0.sx, p0.sy); ctx.lineTo(p1.sx, p1.sy);
+      ctx.strokeStyle = tColor(h, depth, depth * (0.10 + h * 0.25));
+      ctx.lineWidth   = Math.max(0.2, (0.2 + h * 0.5) * depth);
+      ctx.stroke();
+    }
+
+    /* Peak glow + particle spawn */
+    if (depth > 0.30) {
+      for (let c = 0; c <= COLS; c += 2) {
+        const p = verts[r][c];
+        if (!p || p.h < 0.68) continue;
+        const t = (p.h - 0.68) / 0.32;
+        const gR = 4 + p.h * 14;
+        const ga = t * depth * 0.88;
+        const gr = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, gR);
+        gr.addColorStop(0,    `rgba(184,245,60,${ga})`);
+        gr.addColorStop(0.4,  `rgba(80,240,180,${ga * 0.38})`);
+        gr.addColorStop(1,    'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, gR, 0, 6.2832);
+        ctx.fillStyle = gr; ctx.fill();
+
+        /* occasionally spawn particle */
+        if (depth > 0.55 && p.h > 0.78 && Math.random() < 0.012) {
+          spawnParticle(p.sx, p.sy, p.h);
+        }
+      }
+    }
+  }
+
+  /* Update + draw particles */
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    const pa = p.life * 0.7;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+    ctx.fillStyle = `rgba(184,245,60,${pa})`;
+    ctx.fill();
+    /* small glow */
+    const pg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+    pg.addColorStop(0, `rgba(130,255,190,${pa * 0.45})`);
+    pg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, 6.2832);
+    ctx.fillStyle = pg; ctx.fill();
+  }
+
+  /* Horizon fog blend */
+  const hFog = ctx.createLinearGradient(0, HY - 25, 0, HY + 100);
+  hFog.addColorStop(0,   'rgba(0,0,0,0)');
+  hFog.addColorStop(0.4, 'rgba(3,10,20,0.20)');
+  hFog.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = hFog;
+  ctx.fillRect(0, HY - 25, W, 125);
+
+  requestAnimationFrame(render);
+}
+
+/* ── NEW WORLD ─────────────────────────────────────────────────── */
+function newWorld() {
+  seed     = (Math.random() * 99999) | 0;
+  hCache   = {};
+  particles= [];
+  scrollZ  = 0;
+  seedEl.textContent = 'SEED ' + seed.toString().padStart(5, '0');
+  flashEl.style.transition = 'none';
+  flashEl.style.opacity    = '1';
+  requestAnimationFrame(() => {
+    flashEl.style.transition = 'opacity 0.6s ease';
+    flashEl.style.opacity    = '0';
+  });
+}
+
+/* ── BOOT SEQUENCE ─────────────────────────────────────────────── */
+function runBoot() {
+  const brand  = document.getElementById('b-brand');
+  const title  = document.getElementById('b-title');
+  const sub    = document.getElementById('b-sub');
+  const barW   = document.getElementById('b-bar-wrap');
+  const bar    = document.getElementById('b-bar');
+  const status = document.getElementById('b-status');
+
+  const labels = [
+    'Initializing noise engine…',
+    'Building terrain mesh…',
+    'Calibrating atmosphere…',
+    'Placing star field…',
+    'Ready.',
+  ];
+  let labelIdx = 0;
+
+  setTimeout(() => brand.classList.add('show'),  200);
+  setTimeout(() => title.classList.add('show'),  600);
+  setTimeout(() => sub.classList.add('show'),    900);
+  setTimeout(() => {
+    barW.classList.add('show');
+    status.classList.add('show');
+    bar.style.width = '100%';
+    const iv = setInterval(() => {
+      if (labelIdx < labels.length) {
+        status.textContent = labels[labelIdx++];
+      } else {
+        clearInterval(iv);
+      }
+    }, 420);
+  }, 1200);
+
+  setTimeout(() => {
+    bootEl.classList.add('fade-out');
+    hudEl.classList.add('visible');
+    hintsEl.classList.add('visible');
+  }, 3600);
+
+  setTimeout(() => bootEl.classList.add('gone'), 4600);
+}
+
+/* ── INIT ──────────────────────────────────────────────────────── */
+resize();
+buildStars();
+newWorld();
+requestAnimationFrame(render);
+runBoot();
+
+/* ── EVENTS ────────────────────────────────────────────────────── */
+window.addEventListener('resize', resize);
+
+window.addEventListener('mousemove', e => {
+  tYaw   =  (e.clientX / W - 0.5) * 2 * 0.115;
+  tPitch =  (e.clientY / H - 0.5) * 2 * 0.068;
+});
+
+window.addEventListener('click', e => {
+  if (!e.target.closest('a') &&
+      (bootEl.classList.contains('gone') || bootEl.classList.contains('fade-out'))) {
+    newWorld();
+  }
+});
+
+window.addEventListener('wheel', e => {
+  speed = Math.max(0.15, Math.min(10, speed + e.deltaY * 0.004));
+  spdEl.textContent = 'SPD ' + speed.toFixed(1) + '×';
+}, { passive: true });
+
+/* Touch */
+let lastT = null, tMoved = false;
+window.addEventListener('touchstart', e => {
+  lastT = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  tMoved = false;
+}, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (!lastT) return;
+  tMoved = true;
+  const dx = (e.touches[0].clientX - lastT.x) / W;
+  const dy = (e.touches[0].clientY - lastT.y) / H;
+  tYaw   = Math.max(-0.2,  Math.min(0.2,  tYaw   + dx * 1.2));
+  tPitch = Math.max(-0.10, Math.min(0.10, tPitch + dy * 0.7));
+  lastT = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+window.addEventListener('touchend', e => {
+  if (!tMoved && !e.target.closest('a')) newWorld();
+  lastT = null;
+});
+
+}());
+</script>
+</body>
+</html>
