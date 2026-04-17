@@ -4,214 +4,321 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unreal Engine / Game Dev — Nico's Codex</title>
-<meta name="description" content="Curated Unreal Engine and game dev resources — documentation, Blueprints, C++, free assets, and community. Free. No paywalls.">
+<meta name="description" content="Curated Unreal Engine and game dev resources inside a live interactive landscape. Free. No paywalls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & TOKENS ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; }
 a { color: inherit; text-decoration: none; }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
 
 :root {
-  --bg:        #0a0a0a;
-  --bg2:       #111111;
-  --bg3:       #171717;
-  --accent:    #b8f53c;
-  --accent-d:  #7aab1e;
-  --accent-gl: rgba(184,245,60,0.10);
-  --border:    #1e1e1e;
-  --border-hi: #2a2a2a;
-  --text:      #d4d4d4;
-  --text-hi:   #f0f0f0;
-  --muted:     #666666;
-  --dim:       #333333;
-  --mono:      'Courier New', Courier, monospace;
-  --serif:     Georgia, 'Times New Roman', serif;
+  --cyan:    #33d6ff;
+  --cyan-d:  #1a7a99;
+  --cyan-g:  rgba(51,214,255,0.35);
+  --cyan-s:  rgba(51,214,255,0.10);
+  --orange:  #fb923c;
+  --purple:  #a78bfa;
+  --glass:   rgba(0,7,18,0.88);
+  --gb:      rgba(51,214,255,0.14);
+  --mono:    'Share Tech Mono', monospace;
 }
 
-/* ── BASE ─────────────────────────────────────────────────────── */
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--serif);
-  font-size: 1rem;
-  line-height: 1.65;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+html, body {
+  min-height: 100%;
+  background: #000;
+  color: var(--cyan);
+  font-family: var(--mono);
+  overflow-x: hidden;
 }
 
-/* ── STICKY HEADER ────────────────────────────────────────────── */
-.site-header {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.7rem 1.5rem;
-  background: rgba(10,10,10,0.96);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(6px);
+/* ── FIXED TERRAIN BACKDROP ─────────────────────────────────── */
+canvas {
+  display: block; position: fixed; inset: 0; z-index: 1;
+  opacity: 0; transition: opacity 1.4s ease;
 }
-.brand { font-family: var(--mono); font-size: 0.88rem; font-weight: bold; color: var(--accent); letter-spacing: 0.02em; }
-.brand:hover { opacity: 0.8; }
-.header-rule { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; }
+canvas.show { opacity: 1; }
 
-/* ── BREADCRUMB ───────────────────────────────────────────────── */
-.breadcrumb {
-  display: flex; align-items: center; gap: 0.45rem;
-  padding: 0.55rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+.scanlines {
+  position: fixed; inset: 0; z-index: 8; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom, transparent 0px, transparent 3px,
+    rgba(0,0,0,0.13) 3px, rgba(0,0,0,0.13) 4px
+  );
 }
-.breadcrumb a { color: var(--muted); transition: color 0.12s; }
-.breadcrumb a:hover { color: var(--accent); }
-.bc-sep { color: var(--dim); }
-.bc-cur { color: var(--text); }
+.vignette {
+  position: fixed; inset: 0; z-index: 9; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.78) 100%);
+}
 
-/* ── PAGE WRAPPER ─────────────────────────────────────────────── */
-.page-wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; flex: 1; }
+/* ── FIXED HUD CHROME ────────────────────────────────────────── */
+.back-link {
+  position: fixed; top: 0.9rem; left: 1.25rem; z-index: 40;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(51,214,255,0.42); transition: color 0.15s;
+}
+.back-link:hover { color: var(--cyan); }
 
-/* ── HERO ─────────────────────────────────────────────────────── */
-.hero { padding: 3rem 0 2.25rem; }
+.t-ctrl {
+  position: fixed; top: 0.75rem; right: 1.25rem; z-index: 40;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.18rem;
+}
+.t-seed { font-size: 0.58rem; letter-spacing: 0.12em; color: rgba(51,214,255,0.3); }
+.t-hint { font-size: 0.54rem; letter-spacing: 0.1em; color: rgba(51,214,255,0.18); text-transform: uppercase; }
+.t-new-btn {
+  font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(51,214,255,0.32); padding: 3px 9px; margin-top: 0.15rem;
+  border: 1px solid rgba(51,214,255,0.14);
+  transition: color 0.15s, border-color 0.15s;
+}
+.t-new-btn:hover { color: var(--cyan); border-color: rgba(51,214,255,0.5); }
+
+.flash {
+  position: fixed; inset: 0; z-index: 19; pointer-events: none;
+  opacity: 0; background: rgba(51,214,255,0.04);
+}
+
+/* ── SCROLLABLE CONTENT LAYER ────────────────────────────────── */
+.content { position: relative; z-index: 20; }
+
+/* ── HERO ZONE — transparent, terrain shows through ─────────── */
+.hero-zone {
+  min-height: 55vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding: 0 1.5rem 3rem;
+  text-align: center;
+}
+
 .sector-label {
-  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.3em;
-  color: var(--muted); text-transform: uppercase; margin-bottom: 0.8rem;
+  font-size: 0.64rem; letter-spacing: 0.38em;
+  color: rgba(51,214,255,0.38); text-transform: uppercase;
+  margin-bottom: 0.75rem;
 }
-.hero h1 {
-  font-family: var(--mono); font-size: clamp(1.85rem, 4vw, 2.8rem);
-  font-weight: bold; color: var(--text-hi); margin-bottom: 1rem; line-height: 1.1;
-}
-.hero h1 .hl { color: var(--accent); }
-.hero-sub { font-size: 0.9375rem; color: var(--muted); max-width: 600px; line-height: 1.75; }
 
-/* ── SECTION JUMP NAV ────────────────────────────────────────── */
-.section-nav {
+.hero-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(1.5rem, 4.5vw, 2.6rem);
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--cyan);
+  text-shadow:
+    0 0 10px var(--cyan),
+    0 0 28px var(--cyan-g),
+    0 0 55px var(--cyan-g);
+  margin-bottom: 0.8rem; line-height: 1.1;
+}
+
+.hero-sub {
+  font-size: 0.82rem; color: rgba(51,214,255,0.42);
+  max-width: 520px; line-height: 1.75; letter-spacing: 0.03em;
+  margin-bottom: 1.75rem;
+}
+
+.scroll-hint {
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  color: rgba(51,214,255,0.22); text-transform: uppercase;
+  animation: breathe 2.8s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; transform: translateY(0); }
+  50%       { opacity: 1;    transform: translateY(3px); }
+}
+
+/* ── RESOURCES PANEL ─────────────────────────────────────────── */
+.resources-area {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,5,15,0)   0%,
+    rgba(0,5,15,0.93) 3.5%,
+    rgba(0,5,15,0.96) 100%
+  );
+  padding: 2.75rem 0 4rem;
+}
+
+.resources-inner {
+  max-width: 980px; margin: 0 auto; padding: 0 1.5rem;
+}
+
+/* ── JUMP NAV ────────────────────────────────────────────────── */
+.jump-nav {
   display: flex; align-items: center; gap: 0.5rem;
-  padding: 0 0 1.5rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  padding: 0 0 1.75rem; border-bottom: 1px solid rgba(51,214,255,0.1);
+  flex-wrap: wrap;
 }
-.section-nav-label {
-  font-family: var(--mono); font-size: 0.65rem; color: var(--dim);
-  letter-spacing: 0.12em; text-transform: uppercase; margin-right: 0.25rem;
+.jnav-label {
+  font-size: 0.62rem; letter-spacing: 0.2em;
+  color: rgba(51,214,255,0.22); text-transform: uppercase;
+  margin-right: 0.2rem;
 }
-.snav-btn {
-  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
-  letter-spacing: 0.06em; padding: 4px 12px;
-  border: 1px solid var(--border-hi); border-radius: 1px;
-  transition: color 0.12s, border-color 0.12s, background 0.12s;
+.jnav-btn {
+  font-size: 0.68rem; letter-spacing: 0.05em;
+  color: rgba(51,214,255,0.42); padding: 4px 12px;
+  border: 1px solid rgba(51,214,255,0.12);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.snav-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-gl); }
-.snav-sep { color: var(--dim); font-family: var(--mono); font-size: 0.7rem; }
+.jnav-btn:hover { color: var(--cyan); border-color: rgba(51,214,255,0.48); background: var(--cyan-s); }
+.jnav-sep { color: rgba(51,214,255,0.15); font-size: 0.7rem; }
 
-/* ── SUBSECTION HEADER ────────────────────────────────────────── */
-.sub-header {
+/* ── SECTION HEADER ──────────────────────────────────────────── */
+.section-head {
   display: flex; align-items: center; gap: 0.75rem;
-  padding: 2.25rem 0 1rem; flex-wrap: wrap;
+  padding: 2.5rem 0 1.15rem; flex-wrap: wrap;
 }
-.sub-pill {
-  font-family: var(--mono); font-size: 0.63rem; letter-spacing: 0.1em;
-  text-transform: uppercase; padding: 3px 9px; border-radius: 2px;
-  white-space: nowrap; border: 1px solid;
+.sec-pill {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.57rem; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 3px 10px;
+  border: 1px solid; white-space: nowrap;
 }
-.pill-learn { background: rgba(251,146,60,0.07); color: #fb923c; border-color: rgba(251,146,60,0.25); }
-.pill-build { background: rgba(167,139,250,0.07); color: #a78bfa; border-color: rgba(167,139,250,0.25); }
-.sub-title  { font-family: var(--mono); font-size: 0.82rem; color: var(--text); letter-spacing: 0.03em; flex: 1; }
-.sub-count  { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+.pill-learn { color: var(--orange); border-color: rgba(251,146,60,0.35); background: rgba(251,146,60,0.05); }
+.pill-build { color: var(--purple); border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.05); }
+.sec-title { font-family: 'Orbitron', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.65); letter-spacing: 0.07em; flex: 1; }
+.sec-count { font-size: 0.63rem; color: rgba(51,214,255,0.28); white-space: nowrap; }
 
-/* ── CARD GRID ────────────────────────────────────────────────── */
+/* ── CARD GRID ───────────────────────────────────────────────── */
 .card-grid {
-  display: grid; grid-template-columns: repeat(3,1fr);
-  gap: 0.875rem; margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 0.9rem;
+  margin-bottom: 1rem;
 }
 
-/* ── RESOURCE CARD ────────────────────────────────────────────── */
+/* ── RESOURCE CARD ───────────────────────────────────────────── */
 .r-card {
   display: flex; flex-direction: column;
-  background: var(--bg2); border: 1px solid var(--border);
-  padding: 0.85rem 1rem 0.75rem;
-  transition: border-color 0.14s, transform 0.14s;
+  background: var(--glass);
+  border: 1px solid var(--gb);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.9rem 1.05rem 0.82rem;
   position: relative; overflow: hidden;
-  opacity: 0; animation: fadeUp 0.35s ease forwards;
+  opacity: 0; animation: cardReveal 0.4s ease forwards;
+  transition: border-color 0.2s, transform 0.2s, background 0.2s;
 }
-.r-card::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-d), transparent);
-  opacity: 0; transition: opacity 0.14s;
+
+/* Corner brackets */
+.r-card::before, .r-card::after {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px;
+  border-style: solid;
+  border-color: var(--cyan-d);
+  opacity: 0.55;
+  transition: opacity 0.2s, border-color 0.2s;
 }
-.r-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-.r-card:hover::after { opacity: 1; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
+.r-card::before { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; }
+.r-card::after  { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+
+.r-card:hover {
+  border-color: rgba(51,214,255,0.48);
+  background: rgba(0,12,30,0.94);
+  transform: translateY(-3px);
+}
+.r-card:hover::before, .r-card:hover::after { opacity: 1; border-color: var(--cyan); }
+
+/* Bottom scan line on hover */
+.r-card .scan {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-d), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.r-card:hover .scan { opacity: 0.7; }
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.card-step { font-family: var(--mono); font-size: 0.6rem; color: var(--dim); letter-spacing: 0.12em; margin-bottom: 0.4rem; display: block; }
+.card-step { font-size: 0.57rem; letter-spacing: 0.2em; color: rgba(51,214,255,0.22); margin-bottom: 0.4rem; display: block; }
 .card-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.55rem; }
-.card-title { font-family: var(--mono); font-size: 0.8rem; color: var(--text-hi); line-height: 1.4; flex: 1; }
+.card-title { font-size: 0.78rem; color: rgba(220,240,255,0.88); line-height: 1.4; flex: 1; }
 
-/* ── LEVEL BADGES ─────────────────────────────────────────────── */
-.badge { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.08em; padding: 2px 6px; border: 1px solid; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; border-radius: 1px; }
-.badge-beginner     { color: #4ade80; border-color: rgba(74,222,128,0.35); }
-.badge-intermediate { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
-.badge-advanced     { color: #f472b6; border-color: rgba(244,114,182,0.35); }
-.badge-all          { color: var(--accent); border-color: rgba(184,245,60,0.35); }
+.badge { font-size: 0.56rem; letter-spacing: 0.08em; padding: 2px 6px; border: 1px solid; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+.badge-beginner     { color: #4ade80; border-color: rgba(74,222,128,0.28); }
+.badge-intermediate { color: #60a5fa; border-color: rgba(96,165,250,0.28); }
+.badge-advanced     { color: #f472b6; border-color: rgba(244,114,182,0.28); }
+.badge-all          { color: var(--cyan); border-color: rgba(51,214,255,0.28); }
 
 .card-desc {
-  font-size: 0.79rem; color: var(--muted); line-height: 1.62; flex: 1; margin-bottom: 0.75rem;
+  font-size: 0.75rem; color: rgba(51,214,255,0.36); line-height: 1.68;
+  flex: 1; margin-bottom: 0.72rem;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 
 .card-meta-row {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--border);
+  gap: 0.4rem; padding-top: 0.58rem;
+  border-top: 1px solid rgba(51,214,255,0.07);
   margin-top: auto; flex-wrap: wrap;
 }
-.meta-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.chip { font-family: var(--mono); font-size: 0.6rem; padding: 2px 6px; border: 1px solid var(--border-hi); color: var(--muted); white-space: nowrap; border-radius: 1px; }
-.chip-free { color: #4ade80; border-color: rgba(74,222,128,0.3); }
-.card-open { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); white-space: nowrap; transition: color 0.12s; flex-shrink: 0; }
-.r-card:hover .card-open { color: var(--accent); }
+.meta-chips { display: flex; flex-wrap: wrap; gap: 0.28rem; }
+.chip { font-size: 0.58rem; padding: 2px 6px; border: 1px solid rgba(51,214,255,0.12); color: rgba(51,214,255,0.28); white-space: nowrap; }
+.chip-free { color: #4ade80; border-color: rgba(74,222,128,0.22); }
+.card-open { font-size: 0.64rem; color: rgba(51,214,255,0.28); white-space: nowrap; transition: color 0.15s; flex-shrink: 0; }
+.r-card:hover .card-open { color: var(--cyan); }
 
-/* ── FULL-WIDTH DIVIDER ───────────────────────────────────────── */
-.full-divider { border: none; border-top: 1px solid var(--border-hi); margin: 3rem 0 2.5rem; }
+/* ── DEMO BANNER ─────────────────────────────────────────────── */
+.sec-divider { border: none; border-top: 1px solid rgba(51,214,255,0.08); margin: 2.5rem 0 0; }
 
-/* ── DEMO BANNER ──────────────────────────────────────────────── */
 .demo-banner {
   display: flex; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap;
-  padding: 1.25rem 1.5rem;
-  background: var(--bg2); border: 1px solid var(--border-hi);
-  margin-bottom: 3rem;
+  padding: 1.25rem 1.5rem; margin-top: 2.5rem;
+  background: rgba(0,10,25,0.92);
+  border: 1px solid rgba(51,214,255,0.18);
+  backdrop-filter: blur(14px);
+  position: relative;
 }
+.demo-banner::before, .demo-banner::after {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: var(--cyan-d); border-style: solid;
+}
+.demo-banner::before { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; }
+.demo-banner::after  { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+
 .demo-left { flex: 1; min-width: 0; }
-.demo-tag { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.28em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.3rem; }
-.demo-title { font-family: var(--mono); font-size: 1rem; color: var(--text-hi); font-weight: bold; margin-bottom: 0.35rem; }
-.demo-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+.demo-tag  { font-size: 0.6rem; letter-spacing: 0.3em; color: var(--cyan); text-transform: uppercase; margin-bottom: 0.3rem; }
+.demo-title { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: #fff; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: 0.04em; }
+.demo-desc { font-size: 0.78rem; color: rgba(51,214,255,0.38); line-height: 1.65; }
 .demo-link {
-  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em;
-  color: var(--muted); padding: 0.55rem 1.1rem;
-  border: 1px solid var(--border-hi); white-space: nowrap;
-  transition: color 0.12s, border-color 0.12s, background 0.12s; flex-shrink: 0;
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(51,214,255,0.45); padding: 0.55rem 1.2rem;
+  border: 1px solid rgba(51,214,255,0.18); white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s; flex-shrink: 0;
 }
-.demo-link:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-gl); }
+.demo-link:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(51,214,255,0.05); }
 
-/* ── SITE FOOTER ──────────────────────────────────────────────── */
+/* ── FOOTER ──────────────────────────────────────────────────── */
 .site-footer {
+  margin-top: 3rem; padding: 1.4rem 0;
+  border-top: 1px solid rgba(51,214,255,0.08);
   display: flex; align-items: flex-end; justify-content: space-between;
-  padding: 1.4rem 1.5rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem;
+  flex-wrap: wrap; gap: 0.75rem;
 }
-.footer-brand { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); font-weight: bold; }
+.footer-brand { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--cyan); letter-spacing: 0.06em; }
 .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
-.footer-nav a { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); transition: color 0.12s; }
-.footer-nav a:hover { color: var(--accent); }
-.footer-date    { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); }
-.footer-tagline { font-family: var(--mono); font-size: 0.62rem; color: var(--dim); }
+.footer-nav a { font-size: 0.68rem; color: rgba(51,214,255,0.38); transition: color 0.12s; }
+.footer-nav a:hover { color: var(--cyan); }
+.footer-date { font-size: 0.6rem; color: rgba(51,214,255,0.18); }
+.footer-tag  { font-size: 0.6rem; color: rgba(51,214,255,0.18); }
 
-/* ── RESPONSIVE ───────────────────────────────────────────────── */
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .page-wrap   { padding: 0 1rem; }
-  .site-header { padding: 0.6rem 1rem; }
-  .header-rule { display: none; }
-  .breadcrumb  { padding: 0.5rem 1rem; font-size: 0.65rem; }
-  .hero        { padding: 2rem 0 1.5rem; }
-  .card-grid   { grid-template-columns: 1fr; }
+  .resources-inner { padding: 0 1rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .hero-zone { min-height: 42vh; padding-bottom: 2.25rem; }
   .demo-banner { flex-direction: column; align-items: flex-start; }
+  .back-link, .t-ctrl { display: none; }
+  .hero-zone::before {
+    content: '← All Sectors';
+    position: fixed; top: 0.9rem; left: 1rem; z-index: 40;
+    font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(51,214,255,0.42);
+  }
 }
 @media (min-width: 601px) and (max-width: 860px) {
   .card-grid { grid-template-columns: repeat(2,1fr); }
@@ -220,317 +327,732 @@ body {
 </head>
 <body>
 
-<!-- STICKY HEADER -->
-<header class="site-header">
-  <a href="index.html" class="brand">Nico's Codex</a>
-  <span class="header-rule">Rule 78 — Knowledge is free</span>
-</header>
+<canvas id="c"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="flash" id="flash"></div>
 
-<!-- BREADCRUMB -->
-<nav class="breadcrumb" aria-label="breadcrumb">
-  <a href="index.html">← All Sectors</a>
-  <span class="bc-sep">/</span>
-  <span>Sector_04</span>
-  <span class="bc-sep">/</span>
-  <span class="bc-cur">Unreal Engine / Game Dev</span>
-</nav>
+<a href="index.html" class="back-link">← All Sectors</a>
 
-<!-- MAIN -->
-<main class="page-wrap">
+<div class="t-ctrl">
+  <span class="t-seed" id="t-seed">SEED /////</span>
+  <span class="t-hint">click bg · new world</span>
+  <button class="t-new-btn" id="t-new-btn">New World</button>
+</div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <p class="sector-label">04 / All Levels</p>
-    <h1># <span class="hl">Unreal Engine</span> / Game Dev</h1>
-    <p class="hero-sub">Curated resources for learning Unreal Engine 5 — official docs, Blueprint scripting, C++ development, and free assets. Whether you've never opened the editor or you're shipping your first title, everything here is free.</p>
+<div class="content">
+
+  <!-- Hero — terrain visible through this -->
+  <section class="hero-zone">
+    <p class="sector-label">Sector_04 · All Levels</p>
+    <h1 class="hero-title">Unreal Engine<br>/ Game Dev</h1>
+    <p class="hero-sub">Curated resources for UE5 — official docs, Blueprint scripting, C++ development, free assets, and community. Every link is free.</p>
+    <p class="scroll-hint">↓ scroll to explore resources</p>
   </section>
 
-  <!-- SECTION JUMP NAV -->
-  <nav class="section-nav" aria-label="Jump to section">
-    <span class="section-nav-label">Jump to:</span>
-    <a href="#section-learn" class="snav-btn">Learn — Docs, Courses &amp; Tutorials</a>
-    <span class="snav-sep">·</span>
-    <a href="#section-build" class="snav-btn">Build — C++, Assets &amp; Community</a>
-  </nav>
+  <!-- Resources panel -->
+  <div class="resources-area">
+    <div class="resources-inner">
 
-  <!-- SECTION: LEARN -->
-  <div id="section-learn">
-    <div class="sub-header">
-      <span class="sub-pill pill-learn">Learn</span>
-      <span class="sub-title">Docs · Courses · Tutorials</span>
-      <span class="sub-count">6 resources</span>
+      <!-- Jump nav -->
+      <nav class="jump-nav" aria-label="Jump to section">
+        <span class="jnav-label">Navigate:</span>
+        <a href="#sec-learn" class="jnav-btn">Learn — Docs, Courses &amp; Tutorials</a>
+        <span class="jnav-sep">·</span>
+        <a href="#sec-build" class="jnav-btn">Build — C++, Assets &amp; Community</a>
+      </nav>
+
+      <!-- ── SECTION: LEARN ───────────────────────────────────── -->
+      <div id="sec-learn">
+        <div class="section-head">
+          <span class="sec-pill pill-learn">Learn</span>
+          <span class="sec-title">Docs · Courses · Tutorials</span>
+          <span class="sec-count">6 resources</span>
+        </div>
+        <div class="card-grid">
+
+          <a href="https://dev.epicgames.com/community/learning/courses/ZpX/your-first-hour-in-unreal-engine-5"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+            <div class="scan"></div>
+            <span class="card-step">01</span>
+            <div class="card-top">
+              <span class="card-title">Your First Hour in Unreal Engine 5</span>
+              <span class="badge badge-beginner">Beginner</span>
+            </div>
+            <p class="card-desc">Epic's official 1-hour onboarding course. Zero prior experience needed — covers the editor, navigation, lighting, and launching your first project from scratch.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Official</span>
+                <span class="chip">Epic Games</span>
+                <span class="chip">1 hr</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://docs.unrealengine.com/5.3/en-US/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+            <div class="scan"></div>
+            <span class="card-step">02</span>
+            <div class="card-top">
+              <span class="card-title">Unreal Engine 5 Documentation</span>
+              <span class="badge badge-all">All Levels</span>
+            </div>
+            <p class="card-desc">The complete reference for every UE5 feature — editor, rendering, physics, audio, networking. Set it as a browser bookmark before you need it.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Reference</span>
+                <span class="chip">Epic Games</span>
+                <span class="chip">Always current</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://dev.epicgames.com/community/learning"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+            <div class="scan"></div>
+            <span class="card-step">03</span>
+            <div class="card-top">
+              <span class="card-title">Unreal Online Learning</span>
+              <span class="badge badge-all">All Levels</span>
+            </div>
+            <p class="card-desc">Epic's free structured course hub. Blueprints, Lumen, Nanite, MetaHuman, animation, multiplayer — built and maintained by the people who made the engine.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Courses</span>
+                <span class="chip">Epic Games</span>
+                <span class="chip">Self-paced</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://www.youtube.com/@UnrealEngine"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+            <div class="scan"></div>
+            <span class="card-step">04</span>
+            <div class="card-top">
+              <span class="card-title">Unreal Engine YouTube Channel</span>
+              <span class="badge badge-beginner">Beginner</span>
+            </div>
+            <p class="card-desc">Official tutorials, Unreal Fest talks, and feature deep dives. Start with the Getting Started playlist, then follow your interest into rendering, gameplay, or tools.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Video</span>
+                <span class="chip">YouTube</span>
+                <span class="chip">Official</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://docs.unrealengine.com/5.3/en-US/blueprints-visual-scripting-in-unreal-engine/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+            <div class="scan"></div>
+            <span class="card-step">05</span>
+            <div class="card-top">
+              <span class="card-title">Blueprint Visual Scripting</span>
+              <span class="badge badge-beginner">Beginner</span>
+            </div>
+            <p class="card-desc">The complete Blueprint reference. Build full games without writing C++ — event graphs, functions, macros, interfaces, and data-driven design patterns.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Blueprints</span>
+                <span class="chip">Official</span>
+                <span class="chip">Epic Games</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://forums.unrealengine.com/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+            <div class="scan"></div>
+            <span class="card-step">06</span>
+            <div class="card-top">
+              <span class="card-title">Unreal Engine Forums</span>
+              <span class="badge badge-all">All Levels</span>
+            </div>
+            <p class="card-desc">The official community. Post problems, read deep dives, track engine updates from the core team. One of the best technical game dev forums anywhere online.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Community</span>
+                <span class="chip">Forums</span>
+                <span class="chip">Official</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+        </div>
+      </div><!-- /sec-learn -->
+
+      <!-- ── SECTION: BUILD ───────────────────────────────────── -->
+      <div id="sec-build">
+        <div class="section-head">
+          <span class="sec-pill pill-build">Build</span>
+          <span class="sec-title">C++ · Assets · Community</span>
+          <span class="sec-count">6 resources</span>
+        </div>
+        <div class="card-grid">
+
+          <a href="https://docs.unrealengine.com/5.3/en-US/programming-with-cplusplus-in-unreal-engine/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+            <div class="scan"></div>
+            <span class="card-step">01</span>
+            <div class="card-top">
+              <span class="card-title">C++ in Unreal Engine — Official Docs</span>
+              <span class="badge badge-intermediate">Intermediate</span>
+            </div>
+            <p class="card-desc">Official C++ programming guide. Actors, Components, the reflection/UCLASS system, gameplay framework. For developers who want direct control of the engine.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Official</span>
+                <span class="chip">C++</span>
+                <span class="chip">Epic Games</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://unrealcpp.com/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+            <div class="scan"></div>
+            <span class="card-step">02</span>
+            <div class="card-top">
+              <span class="card-title">UnrealCPP.com</span>
+              <span class="badge badge-intermediate">Intermediate</span>
+            </div>
+            <p class="card-desc">Community-built C++ snippet library for Unreal. Timers, delegates, interfaces, game modes — every entry is a complete, tested working example you can drop in immediately.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Community</span>
+                <span class="chip">C++</span>
+                <span class="chip">Snippets</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://www.tomlooman.com/unreal-engine-cpp-guide/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+            <div class="scan"></div>
+            <span class="card-step">03</span>
+            <div class="card-top">
+              <span class="card-title">Tom Looman — UE C++ Guide</span>
+              <span class="badge badge-intermediate">Intermediate</span>
+            </div>
+            <p class="card-desc">Written by a former Epic developer. Gameplay Ability System, data-driven design, best practices, and architecture patterns. One of the best non-official UE resources anywhere.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Expert</span>
+                <span class="chip">C++</span>
+                <span class="chip">Deep Dive</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://www.fab.com/"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+            <div class="scan"></div>
+            <span class="card-step">04</span>
+            <div class="card-top">
+              <span class="card-title">Fab.com — Free Assets</span>
+              <span class="badge badge-all">All Levels</span>
+            </div>
+            <p class="card-desc">Epic's official asset marketplace. Thousands of free environments, characters, audio packs, and materials. Filter by Free and start building without touching your budget.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Assets</span>
+                <span class="chip">Marketplace</span>
+                <span class="chip">Epic Games</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://quixel.com/megascans/home"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+            <div class="scan"></div>
+            <span class="card-step">05</span>
+            <div class="card-top">
+              <span class="card-title">Quixel Megascans</span>
+              <span class="badge badge-all">All Levels</span>
+            </div>
+            <p class="card-desc">Free photorealistic surface and object scans for UE5. Every rock, terrain, wall, and material library entry was scanned from real-world reference. Instant production quality.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Assets</span>
+                <span class="chip">Quixel</span>
+                <span class="chip">Photorealistic</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+          <a href="https://www.youtube.com/@VirtusEdu"
+             target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+            <div class="scan"></div>
+            <span class="card-step">06</span>
+            <div class="card-top">
+              <span class="card-title">Virtus Learning Hub</span>
+              <span class="badge badge-beginner">Beginner</span>
+            </div>
+            <p class="card-desc">One of the most-watched free Unreal YouTube channels. Full project walkthroughs — empty scene to complete playable level. Great for seeing how real projects get built end to end.</p>
+            <div class="card-meta-row">
+              <div class="meta-chips">
+                <span class="chip chip-free">Free</span>
+                <span class="chip">Video</span>
+                <span class="chip">YouTube</span>
+                <span class="chip">Projects</span>
+              </div>
+              <span class="card-open">Open →</span>
+            </div>
+          </a>
+
+        </div>
+      </div><!-- /sec-build -->
+
+      <hr class="sec-divider">
+
+      <!-- Demo banner -->
+      <div class="demo-banner">
+        <div class="demo-left">
+          <p class="demo-tag">// Standalone Experience</p>
+          <p class="demo-title">TERRAIN_∞</p>
+          <p class="demo-desc">Open the full-screen version — infinite procedural wireframe landscape with mouse-look controls, speed scroll, and one-click world regeneration.</p>
+        </div>
+        <a href="landscape.html" class="demo-link">Launch Full Experience →</a>
+      </div>
+
+      <footer class="site-footer">
+        <span class="footer-brand">Nico's Codex</span>
+        <div class="footer-right">
+          <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
+          <span class="footer-date">Updated April 2026</span>
+          <span class="footer-tag">Every resource is 100% free</span>
+        </div>
+      </footer>
+
     </div>
-
-    <div class="card-grid">
-
-      <a href="https://dev.epicgames.com/community/learning/courses/ZpX/your-first-hour-in-unreal-engine-5"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
-        <span class="card-step">01</span>
-        <div class="card-top">
-          <span class="card-title">Your First Hour in Unreal Engine 5</span>
-          <span class="badge badge-beginner">Beginner</span>
-        </div>
-        <p class="card-desc">Epic's official 1-hour onboarding course. Zero prior experience needed — covers the editor, navigation, lighting, and launching your first project from scratch.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Official</span>
-            <span class="chip">Epic Games</span>
-            <span class="chip">1 hr</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://docs.unrealengine.com/5.3/en-US/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
-        <span class="card-step">02</span>
-        <div class="card-top">
-          <span class="card-title">Unreal Engine 5 Documentation</span>
-          <span class="badge badge-all">All Levels</span>
-        </div>
-        <p class="card-desc">The complete reference for every UE5 feature — editor, rendering, physics, audio, networking. Set it as a browser bookmark before you need it.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Reference</span>
-            <span class="chip">Epic Games</span>
-            <span class="chip">Always current</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://dev.epicgames.com/community/learning"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
-        <span class="card-step">03</span>
-        <div class="card-top">
-          <span class="card-title">Unreal Online Learning</span>
-          <span class="badge badge-all">All Levels</span>
-        </div>
-        <p class="card-desc">Epic's free structured course hub. Blueprints, Lumen, Nanite, MetaHuman, animation, multiplayer — built and maintained by the people who made the engine.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Courses</span>
-            <span class="chip">Epic Games</span>
-            <span class="chip">Self-paced</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://www.youtube.com/@UnrealEngine"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
-        <span class="card-step">04</span>
-        <div class="card-top">
-          <span class="card-title">Unreal Engine YouTube Channel</span>
-          <span class="badge badge-beginner">Beginner</span>
-        </div>
-        <p class="card-desc">Official tutorials, Unreal Fest talks, and feature deep dives. Start with the Getting Started playlist, then follow your interest into rendering, gameplay, or tools.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Video</span>
-            <span class="chip">YouTube</span>
-            <span class="chip">Official</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://docs.unrealengine.com/5.3/en-US/blueprints-visual-scripting-in-unreal-engine/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
-        <span class="card-step">05</span>
-        <div class="card-top">
-          <span class="card-title">Blueprint Visual Scripting</span>
-          <span class="badge badge-beginner">Beginner</span>
-        </div>
-        <p class="card-desc">The complete Blueprint reference. Build full games without writing C++ — event graphs, functions, macros, interfaces, and data-driven design patterns.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Blueprints</span>
-            <span class="chip">Official</span>
-            <span class="chip">Epic Games</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://forums.unrealengine.com/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
-        <span class="card-step">06</span>
-        <div class="card-top">
-          <span class="card-title">Unreal Engine Forums</span>
-          <span class="badge badge-all">All Levels</span>
-        </div>
-        <p class="card-desc">The official community. Post problems, read deep dives, track engine updates from the core team. One of the best technical game dev forums anywhere online.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Community</span>
-            <span class="chip">Forums</span>
-            <span class="chip">Official</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-    </div>
-  </div><!-- /section-learn -->
-
-  <!-- SECTION: BUILD -->
-  <div id="section-build">
-    <div class="sub-header">
-      <span class="sub-pill pill-build">Build</span>
-      <span class="sub-title">C++ · Assets · Community</span>
-      <span class="sub-count">6 resources</span>
-    </div>
-
-    <div class="card-grid">
-
-      <a href="https://docs.unrealengine.com/5.3/en-US/programming-with-cplusplus-in-unreal-engine/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
-        <span class="card-step">01</span>
-        <div class="card-top">
-          <span class="card-title">C++ in Unreal Engine — Official Docs</span>
-          <span class="badge badge-intermediate">Intermediate</span>
-        </div>
-        <p class="card-desc">Official C++ programming guide. Actors, Components, the reflection/UCLASS system, gameplay framework. For developers who want direct control of the engine.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Official</span>
-            <span class="chip">C++</span>
-            <span class="chip">Epic Games</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://unrealcpp.com/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
-        <span class="card-step">02</span>
-        <div class="card-top">
-          <span class="card-title">UnrealCPP.com</span>
-          <span class="badge badge-intermediate">Intermediate</span>
-        </div>
-        <p class="card-desc">Community-built C++ snippet library for Unreal. Timers, delegates, interfaces, game modes — every entry is a complete, tested working example you can drop in immediately.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Community</span>
-            <span class="chip">C++</span>
-            <span class="chip">Snippets</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://www.tomlooman.com/unreal-engine-cpp-guide/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
-        <span class="card-step">03</span>
-        <div class="card-top">
-          <span class="card-title">Tom Looman — UE C++ Guide</span>
-          <span class="badge badge-intermediate">Intermediate</span>
-        </div>
-        <p class="card-desc">Written by a former Epic developer. Gameplay Ability System, data-driven design, best practices, and architecture patterns. One of the best non-official UE resources anywhere.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Expert</span>
-            <span class="chip">C++</span>
-            <span class="chip">Deep Dive</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://www.fab.com/"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
-        <span class="card-step">04</span>
-        <div class="card-top">
-          <span class="card-title">Fab.com — Free Assets</span>
-          <span class="badge badge-all">All Levels</span>
-        </div>
-        <p class="card-desc">Epic's official asset marketplace. Thousands of free environments, characters, audio packs, and materials. Filter by Free and start building without touching your budget.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Assets</span>
-            <span class="chip">Marketplace</span>
-            <span class="chip">Epic Games</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://quixel.com/megascans/home"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
-        <span class="card-step">05</span>
-        <div class="card-top">
-          <span class="card-title">Quixel Megascans</span>
-          <span class="badge badge-all">All Levels</span>
-        </div>
-        <p class="card-desc">Free photorealistic surface and object scans for UE5. Every rock, terrain, wall, and material library entry was scanned from real-world reference. Instant production quality.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Assets</span>
-            <span class="chip">Quixel</span>
-            <span class="chip">Photorealistic</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-      <a href="https://www.youtube.com/@VirtusEdu"
-         target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
-        <span class="card-step">06</span>
-        <div class="card-top">
-          <span class="card-title">Virtus Learning Hub</span>
-          <span class="badge badge-beginner">Beginner</span>
-        </div>
-        <p class="card-desc">One of the most-watched free Unreal YouTube channels. Full project walkthroughs — empty scene to complete playable level. Great for seeing how real projects get built end to end.</p>
-        <div class="card-meta-row">
-          <div class="meta-chips">
-            <span class="chip chip-free">Free</span>
-            <span class="chip">Video</span>
-            <span class="chip">YouTube</span>
-            <span class="chip">Projects</span>
-          </div>
-          <span class="card-open">Open →</span>
-        </div>
-      </a>
-
-    </div>
-  </div><!-- /section-build -->
-
-  <!-- DIVIDER -->
-  <hr class="full-divider">
-
-  <!-- INTERACTIVE DEMO BANNER -->
-  <div class="demo-banner">
-    <div class="demo-left">
-      <p class="demo-tag">// Interactive Demo</p>
-      <p class="demo-title">TERRAIN_∞</p>
-      <p class="demo-desc">An infinite procedural landscape running in-browser — wireframe terrain, aurora sky, procedural noise generation. The same principles that power Unreal's world partition and terrain system, distilled to raw canvas.</p>
-    </div>
-    <a href="landscape.html" class="demo-link">Launch Experience →</a>
   </div>
+</div><!-- /content -->
 
-</main>
+<script>
+(function () {
+'use strict';
 
-<!-- SITE FOOTER -->
-<footer class="site-footer">
-  <span class="footer-brand">Nico's Codex</span>
-  <div class="footer-right">
-    <nav class="footer-nav"><a href="index.html">← All Sectors</a></nav>
-    <span class="footer-date">Updated April 2026</span>
-    <span class="footer-tagline">Every resource is 100% free</span>
-  </div>
-</footer>
+/* ── CANVAS / DOM ─────────────────────────────────────────────── */
+const cv      = document.getElementById('c');
+const ctx     = cv.getContext('2d');
+const seedEl  = document.getElementById('t-seed');
+const flashEl = document.getElementById('flash');
+const newBtn  = document.getElementById('t-new-btn');
 
+let W, H, HX, HY;
+function resize() {
+  W  = cv.width  = window.innerWidth;
+  H  = cv.height = window.innerHeight;
+  HX = W / 2;
+  HY = Math.round(H * 0.44);
+}
+
+/* ── TERRAIN CONFIG ───────────────────────────────────────────── */
+const COLS  = 32;
+const ROWS  = 80;
+const CELL  = 80;
+const CAM_H = 180;
+const FOV   = 570;
+const NEAR  = 52;
+const H_SC  = 175;
+const FOG_N = 1500;
+const FOG_F = 5800;
+
+/* ── STATE ────────────────────────────────────────────────────── */
+let seed      = 0;
+let scrollZ   = 0;
+let speed     = 0.6;
+let tYaw      = 0, tPitch = 0;
+let yaw       = 0, pitch  = 0;
+let stars     = [];
+let hCache    = {};
+let particles = [];
+let time      = 0;
+
+/* ── NOISE ────────────────────────────────────────────────────── */
+function h21(x, y) {
+  const n = Math.sin(x * 127.1 + y * 311.7 + seed * 0.41) * 43758.5453;
+  return n - Math.floor(n);
+}
+const smooth = t => t * t * (3 - 2 * t);
+const mix    = (a, b, t) => a + (b - a) * t;
+
+function vnoise(x, y) {
+  const ix = Math.floor(x), iy = Math.floor(y);
+  const ux = smooth(x - ix), uy = smooth(y - iy);
+  return mix(
+    mix(h21(ix,iy),   h21(ix+1,iy),   ux),
+    mix(h21(ix,iy+1), h21(ix+1,iy+1), ux),
+    uy
+  );
+}
+function fbm(x, y) {
+  let v = 0, a = 0.5, f = 1;
+  for (let i = 0; i < 6; i++) { v += vnoise(x*f, y*f)*a; a*=.5; f*=2.07; }
+  return Math.min(1, v * 1.03);
+}
+
+/* ── HEIGHT CACHE ─────────────────────────────────────────────── */
+function getRow(wr) {
+  if (hCache[wr]) return hCache[wr];
+  const row = new Float32Array(COLS + 1);
+  const FQ  = 0.046;
+  for (let c = 0; c <= COLS; c++) row[c] = fbm(c * FQ, wr * FQ * 0.62);
+  hCache[wr] = row;
+  delete hCache[wr - ROWS - 10];
+  return row;
+}
+
+/* ── STARS ────────────────────────────────────────────────────── */
+function buildStars() {
+  stars = [];
+  for (let i = 0; i < 260; i++) {
+    stars.push({
+      nx: Math.random(), ny: Math.random() * 0.44,
+      r:  Math.random() * 1.6  + 0.22,
+      br: Math.random() * 0.52 + 0.25,
+      ph: Math.random() * 6.28,
+      twinkleSpeed: Math.random() * 0.8 + 0.4
+    });
+  }
+}
+
+/* ── PARTICLES ────────────────────────────────────────────────── */
+function spawnParticle(sx, sy) {
+  if (particles.length > 55) return;
+  particles.push({
+    x: sx + (Math.random() - 0.5) * 12,
+    y: sy,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: -(Math.random() * 0.6 + 0.2),
+    life: 1.0,
+    decay: Math.random() * 0.008 + 0.005,
+    r: Math.random() * 2 + 1
+  });
+}
+
+/* ── PROJECTION ───────────────────────────────────────────────── */
+function project(wx, wy, wz) {
+  const cY = Math.cos(yaw), sY = Math.sin(yaw);
+  const cP = Math.cos(pitch), sP = Math.sin(pitch);
+  const rx  =  wx * cY - wz * sY;
+  const rz1 =  wx * sY + wz * cY;
+  const ry  =  wy * cP - rz1 * sP;
+  const rz  =  wy * sP + rz1 * cP;
+  if (rz <= NEAR) return null;
+  const s = FOV / rz;
+  return { sx: HX + rx*s, sy: HY + ry*s, z: rz };
+}
+
+/* ── COLOUR ───────────────────────────────────────────────────── */
+function tColor(h, depth, alpha) {
+  let r, g, b;
+  if (h < 0.20) {
+    const t = h / 0.20;
+    r = Math.round(mix(12, 20,  t));
+    g = Math.round(mix(20, 120, t));
+    b = Math.round(mix(80, 210, t));
+  } else if (h < 0.48) {
+    const t = (h - 0.20) / 0.28;
+    r = Math.round(mix(20,  100, t));
+    g = Math.round(mix(120, 255, t));
+    b = Math.round(mix(210, 100, t));
+  } else if (h < 0.76) {
+    const t = (h - 0.48) / 0.28;
+    r = Math.round(mix(100, 184, t));
+    g = 255;
+    b = Math.round(mix(100, 55,  t));
+  } else {
+    const t = (h - 0.76) / 0.24;
+    r = Math.round(mix(184, 240, t));
+    g = Math.round(mix(245, 255, t));
+    b = Math.round(mix(55,  220, t));
+  }
+  r = Math.round(r * depth + 2  * (1-depth));
+  g = Math.round(g * depth + 8  * (1-depth));
+  b = Math.round(b * depth + 22 * (1-depth));
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/* ── SKY ──────────────────────────────────────────────────────── */
+function drawSky() {
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0,    '#00000c');
+  sky.addColorStop(0.28, '#010818');
+  sky.addColorStop(0.40, '#040d20');
+  sky.addColorStop(0.44, '#060f1a');
+  sky.addColorStop(1,    '#020c0e');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  const aColors = [
+    'rgba(80,40,180,0.032)',
+    'rgba(30,160,130,0.028)',
+    'rgba(60,80,220,0.025)',
+  ];
+  for (let b = 0; b < 3; b++) {
+    const baseY = H * (0.04 + b * 0.07);
+    ctx.beginPath();
+    ctx.moveTo(0, baseY);
+    for (let x = 0; x <= W; x += 18) {
+      const y = baseY
+        + Math.sin(x * 0.006 + time * (0.22 + b * 0.08)) * 28
+        + Math.sin(x * 0.003 + time * 0.14 + b * 1.7)     * 18;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+    ctx.fillStyle = aColors[b];
+    ctx.fill();
+  }
+
+  for (const s of stars) {
+    const pulse = 0.52 + 0.48 * Math.sin(time * s.twinkleSpeed + s.ph);
+    ctx.beginPath();
+    ctx.arc(s.nx * W, s.ny * H, s.r, 0, 6.2832);
+    ctx.fillStyle = `rgba(200,220,255,${s.br * pulse})`;
+    ctx.fill();
+  }
+
+  const sunX = HX + Math.sin(time * 0.012) * W * 0.08;
+  const sunY = HY - 22;
+  const sunR = 38;
+
+  const corona = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, W * 0.45);
+  corona.addColorStop(0,   'rgba(130,255,200,0.11)');
+  corona.addColorStop(0.12,'rgba(80,220,170,0.07)');
+  corona.addColorStop(0.35,'rgba(40,180,130,0.03)');
+  corona.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = corona;
+  ctx.fillRect(0, 0, W, H);
+
+  const ring = ctx.createRadialGradient(sunX, sunY, sunR * 0.8, sunX, sunY, sunR * 4.5);
+  ring.addColorStop(0,  'rgba(160,255,210,0.22)');
+  ring.addColorStop(0.3,'rgba(100,240,180,0.08)');
+  ring.addColorStop(1,  'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR * 4.5, 0, 6.2832);
+  ctx.fillStyle = ring;
+  ctx.fill();
+
+  const orb = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
+  orb.addColorStop(0,   `rgba(230,255,245,${0.92 + 0.08 * Math.sin(time * 0.4)})`);
+  orb.addColorStop(0.25,'rgba(180,255,225,0.80)');
+  orb.addColorStop(0.55,'rgba(100,245,190,0.45)');
+  orb.addColorStop(1,   'rgba(40,180,140,0)');
+  ctx.beginPath();
+  ctx.arc(sunX, sunY, sunR, 0, 6.2832);
+  ctx.fillStyle = orb;
+  ctx.fill();
+}
+
+/* ── RENDER LOOP ──────────────────────────────────────────────── */
+function render(ts) {
+  time    = ts * 0.001;
+  scrollZ += speed;
+  yaw     += (tYaw   - yaw)   * 0.05;
+  pitch   += (tPitch - pitch) * 0.05;
+
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+
+  const scrollRow = Math.floor(scrollZ / CELL);
+  const subOff    = scrollZ % CELL;
+  const offX      = -(COLS * CELL) / 2;
+
+  const verts = [];
+  for (let r = 0; r <= ROWS; r++) {
+    verts[r] = [];
+    const wr  = scrollRow + r;
+    const rh  = getRow(wr);
+    const wz  = r * CELL - subOff + NEAR;
+    for (let c = 0; c <= COLS; c++) {
+      const wx = offX + c * CELL;
+      const h  = rh[c];
+      const p  = project(wx, CAM_H - h * H_SC, wz);
+      verts[r][c] = p ? { sx: p.sx, sy: p.sy, z: p.z, h } : null;
+    }
+  }
+
+  for (let r = ROWS - 1; r >= 0; r--) {
+    const wz    = r * CELL - subOff + NEAR;
+    if (wz <= 0) continue;
+    const fog   = Math.max(0, Math.min(1, (wz - FOG_N) / (FOG_F - FOG_N)));
+    const depth = 1 - fog;
+    if (depth < 0.01) continue;
+
+    if (depth > 0.06) {
+      for (let c = 0; c < COLS; c++) {
+        const p00 = verts[r][c],     p10 = verts[r][c+1];
+        const p01 = verts[r+1]?.[c], p11 = verts[r+1]?.[c+1];
+        if (!p00 || !p10 || !p01 || !p11) continue;
+        const h = (p00.h + p10.h + p01.h + p11.h) * 0.25;
+        ctx.beginPath();
+        ctx.moveTo(p00.sx, p00.sy); ctx.lineTo(p10.sx, p10.sy);
+        ctx.lineTo(p11.sx, p11.sy); ctx.lineTo(p01.sx, p01.sy);
+        ctx.closePath();
+        ctx.fillStyle = tColor(h, depth, depth * 0.19);
+        ctx.fill();
+      }
+    }
+
+    for (let c = 0; c <= COLS; c++) {
+      const p0 = verts[r][c], p1 = verts[r+1]?.[c];
+      if (!p0 || !p1) continue;
+      ctx.beginPath();
+      ctx.moveTo(p0.sx, p0.sy); ctx.lineTo(p1.sx, p1.sy);
+      ctx.strokeStyle = tColor(p0.h, depth, depth * (0.2 + p0.h * 0.5));
+      ctx.lineWidth   = Math.max(0.25, (0.28 + p0.h * 0.72) * depth);
+      ctx.stroke();
+    }
+
+    for (let c = 0; c < COLS; c++) {
+      const p0 = verts[r][c], p1 = verts[r][c+1];
+      if (!p0 || !p1) continue;
+      const h = (p0.h + p1.h) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(p0.sx, p0.sy); ctx.lineTo(p1.sx, p1.sy);
+      ctx.strokeStyle = tColor(h, depth, depth * (0.10 + h * 0.25));
+      ctx.lineWidth   = Math.max(0.2, (0.2 + h * 0.5) * depth);
+      ctx.stroke();
+    }
+
+    if (depth > 0.30) {
+      for (let c = 0; c <= COLS; c += 2) {
+        const p = verts[r][c];
+        if (!p || p.h < 0.68) continue;
+        const t  = (p.h - 0.68) / 0.32;
+        const gR = 4 + p.h * 14;
+        const ga = t * depth * 0.88;
+        const gr = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, gR);
+        gr.addColorStop(0,   `rgba(184,245,60,${ga})`);
+        gr.addColorStop(0.4, `rgba(80,240,180,${ga * 0.38})`);
+        gr.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, gR, 0, 6.2832);
+        ctx.fillStyle = gr; ctx.fill();
+        if (depth > 0.55 && p.h > 0.78 && Math.random() < 0.012) spawnParticle(p.sx, p.sy);
+      }
+    }
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    const pa = p.life * 0.7;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+    ctx.fillStyle = `rgba(184,245,60,${pa})`;
+    ctx.fill();
+    const pg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+    pg.addColorStop(0, `rgba(130,255,190,${pa * 0.45})`);
+    pg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, 6.2832);
+    ctx.fillStyle = pg; ctx.fill();
+  }
+
+  const hFog = ctx.createLinearGradient(0, HY - 25, 0, HY + 100);
+  hFog.addColorStop(0,   'rgba(0,0,0,0)');
+  hFog.addColorStop(0.4, 'rgba(3,10,20,0.20)');
+  hFog.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = hFog;
+  ctx.fillRect(0, HY - 25, W, 125);
+
+  requestAnimationFrame(render);
+}
+
+/* ── NEW WORLD ────────────────────────────────────────────────── */
+function newWorld() {
+  seed      = (Math.random() * 99999) | 0;
+  hCache    = {};
+  particles = [];
+  scrollZ   = 0;
+  seedEl.textContent = 'SEED ' + seed.toString().padStart(5, '0');
+  flashEl.style.transition = 'none';
+  flashEl.style.opacity    = '1';
+  requestAnimationFrame(() => {
+    flashEl.style.transition = 'opacity 0.6s ease';
+    flashEl.style.opacity    = '0';
+  });
+}
+
+/* ── CARD HOVER: slight speed pulse ──────────────────────────── */
+const cards = document.querySelectorAll('.r-card');
+cards.forEach(card => {
+  card.addEventListener('mouseenter', () => { speed = Math.min(speed * 1.6, 3.2); });
+  card.addEventListener('mouseleave', () => { speed = 0.6; });
+});
+
+/* ── INIT ─────────────────────────────────────────────────────── */
+resize();
+buildStars();
+newWorld();
+requestAnimationFrame(render);
+requestAnimationFrame(() => cv.classList.add('show'));
+
+/* ── EVENTS ───────────────────────────────────────────────────── */
+window.addEventListener('resize', resize);
+
+window.addEventListener('mousemove', e => {
+  tYaw   =  (e.clientX / W - 0.5) * 2 * 0.10;
+  tPitch =  (e.clientY / H - 0.5) * 2 * 0.055;
+});
+
+window.addEventListener('click', e => {
+  if (!e.target.closest('a') && !e.target.closest('button') && !e.target.closest('.r-card')) {
+    newWorld();
+  }
+});
+
+newBtn.addEventListener('click', () => newWorld());
+
+window.addEventListener('wheel', e => {
+  speed = Math.max(0.15, Math.min(8, speed + e.deltaY * 0.003));
+}, { passive: true });
+
+let lastT = null, tMoved = false;
+window.addEventListener('touchstart', e => {
+  lastT = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  tMoved = false;
+}, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (!lastT) return;
+  tMoved = true;
+  const dx = (e.touches[0].clientX - lastT.x) / W;
+  const dy = (e.touches[0].clientY - lastT.y) / H;
+  tYaw   = Math.max(-0.18, Math.min(0.18, tYaw   + dx * 1.2));
+  tPitch = Math.max(-0.09, Math.min(0.09, tPitch + dy * 0.7));
+  lastT = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+window.addEventListener('touchend', e => {
+  if (!tMoved && !e.target.closest('a') && !e.target.closest('button')) newWorld();
+  lastT = null;
+});
+
+}());
+</script>
 </body>
 </html>
