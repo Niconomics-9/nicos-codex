@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scripting — Nico's Codex</title>
+<meta name="description" content="Curated scripting resources for IT pros and developers — PowerShell, Bash, Python, and automation. Free. No paywalls.">
+<style>
+/* ── RESET & TOKENS ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+
+:root {
+  --bg:        #0a0a0a;
+  --bg2:       #111111;
+  --bg3:       #171717;
+  --accent:    #b8f53c;
+  --accent-d:  #7aab1e;
+  --accent-gl: rgba(184,245,60,0.10);
+  --border:    #1e1e1e;
+  --border-hi: #2a2a2a;
+  --text:      #d4d4d4;
+  --text-hi:   #f0f0f0;
+  --muted:     #666666;
+  --dim:       #333333;
+  --mono:      'Courier New', Courier, monospace;
+  --serif:     Georgia, 'Times New Roman', serif;
+  --t-sys:     #b8f53c;
+  --t-err:     #ff5555;
+  --t-info:    #57c7ff;
+  --t-warn:    #f4c842;
+}
+
+/* ── BASE ─────────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.65;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── STICKY HEADER ────────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1.5rem;
+  background: rgba(10,10,10,0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+.brand {
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.brand:hover { opacity: 0.8; }
+.header-rule {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* ── BREADCRUMB ───────────────────────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.breadcrumb a { color: var(--muted); transition: color 0.12s; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--dim); }
+.bc-cur { color: var(--text); }
+
+/* ── PAGE WRAPPER ─────────────────────────────────────────────── */
+.page-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  flex: 1;
+}
+
+/* ── HERO ─────────────────────────────────────────────────────── */
+.hero { padding: 3rem 0 2.25rem; }
+.sector-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.hero h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.85rem, 4vw, 2.8rem);
+  font-weight: bold;
+  color: var(--text-hi);
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+.hero h1 .hl { color: var(--accent); }
+.hero-sub {
+  font-size: 0.9375rem;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.75;
+}
+
+/* ── SUBSECTION HEADER ────────────────────────────────────────── */
+.sub-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.25rem 0 1rem;
+  flex-wrap: wrap;
+}
+.sub-pill {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  white-space: nowrap;
+  border: 1px solid;
+}
+.pill-it  { background: rgba(34,211,238,0.07); color: #22d3ee; border-color: rgba(34,211,238,0.25); }
+.pill-dev { background: rgba(167,139,250,0.07); color: #a78bfa; border-color: rgba(167,139,250,0.25); }
+.sub-title {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--text);
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+.sub-count {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── CARD GRID ────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* ── RESOURCE CARD ────────────────────────────────────────────── */
+.r-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 1.1rem 1.15rem 0.9rem;
+  transition: border-color 0.14s, transform 0.14s;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.35s ease forwards;
+}
+.r-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-d), transparent);
+  opacity: 0;
+  transition: opacity 0.14s;
+}
+.r-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+.r-card:hover::after { opacity: 1; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* card top: title + badge */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+.card-title {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--text-hi);
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* ── LEVEL BADGES ─────────────────────────────────────────────── */
+.badge {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border: 1px solid;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+.badge-beginner     { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+.badge-intermediate { color: #60a5fa; border-color: rgba(96,165,250,0.35); }
+.badge-advanced     { color: #f472b6; border-color: rgba(244,114,182,0.35); }
+.badge-all          { color: var(--accent); border-color: rgba(184,245,60,0.35); }
+
+.card-desc {
+  font-size: 0.79rem;
+  color: var(--muted);
+  line-height: 1.62;
+  flex: 1;
+  margin-bottom: 0.75rem;
+}
+
+/* meta row */
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+.meta-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.chip {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border: 1px solid var(--border-hi);
+  color: var(--muted);
+  white-space: nowrap;
+  border-radius: 1px;
+}
+.chip-free { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+.card-open {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color 0.12s;
+  flex-shrink: 0;
+}
+.r-card:hover .card-open { color: var(--accent); }
+
+/* ── FULL-WIDTH DIVIDER ───────────────────────────────────────── */
+.full-divider {
+  border: none;
+  border-top: 1px solid var(--border-hi);
+  margin: 3rem 0 2.5rem;
+}
+
+/* ── TERMINAL INTRO ───────────────────────────────────────────── */
+.terminal-intro { padding-bottom: 1.25rem; }
+.terminal-intro-label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.32em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.terminal-intro h2 {
+  font-family: var(--mono);
+  font-size: 1.25rem;
+  color: var(--text-hi);
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+.terminal-intro h2 .hl { color: var(--accent); }
+.terminal-intro p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  max-width: 620px;
+  line-height: 1.75;
+}
+
+/* ── TERMINAL GAME ────────────────────────────────────────────── */
+.codex-terminal {
+  background: var(--bg2);
+  border: 1px solid var(--border-hi);
+  margin-bottom: 3rem;
+  font-family: var(--mono);
+}
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+.t-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.t-dot-r { background: #ff5f57; }
+.t-dot-y { background: #febc2e; }
+.t-dot-g { background: #28c840; }
+.terminal-title {
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  margin-left: 0.2rem;
+}
+.terminal-output {
+  height: 400px;
+  overflow-y: auto;
+  padding: 1rem 1.1rem;
+  scroll-behavior: smooth;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.55;
+}
+.terminal-output::-webkit-scrollbar { width: 4px; }
+.terminal-output::-webkit-scrollbar-track { background: transparent; }
+.terminal-output::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+.t-line { display: block; font-size: 0.77rem; }
+.t-sys  { color: var(--t-sys); }
+.t-err  { color: var(--t-err); }
+.t-info { color: var(--t-info); }
+.t-warn { color: var(--t-warn); }
+.t-dim  { color: var(--muted); }
+.t-cmd  { color: var(--text); }
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-top: 1px solid var(--border);
+}
+.t-prompt {
+  font-family: var(--mono);
+  font-size: 0.77rem;
+  color: var(--accent);
+  white-space: nowrap;
+  user-select: none;
+  flex-shrink: 0;
+}
+#t-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 0.77rem;
+  color: var(--text-hi);
+  caret-color: var(--accent);
+}
+.t-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-top: 1px solid var(--border);
+  min-height: 2.4rem;
+}
+.t-btn {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--border-hi);
+  color: var(--muted);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+  border-radius: 1px;
+}
+.t-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-gl); }
+
+/* ── SITE FOOTER ──────────────────────────────────────────────── */
+.site-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 1.4rem 1.5rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.footer-brand {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: bold;
+}
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.footer-nav a {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  transition: color 0.12s;
+}
+.footer-nav a:hover { color: var(--accent); }
+.footer-date {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--dim);
+}
+.footer-tagline {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--dim);
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .page-wrap   { padding: 0 1rem; }
+  .site-header { padding: 0.6rem 1rem; }
+  .header-rule { display: none; }
+  .breadcrumb  { padding: 0.5rem 1rem; font-size: 0.65rem; }
+  .hero        { padding: 2rem 0 1.5rem; }
+  .card-grid   { grid-template-columns: 1fr; }
+  .terminal-output { height: 300px; }
+  .full-divider { margin: 2rem 0 1.75rem; }
+  .sub-header { padding: 1.5rem 0 0.75rem; gap: 0.5rem; }
+  .site-footer { padding: 1.1rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── STICKY HEADER ──────────────────────────────────────────── -->
+<header class="site-header">
+  <a href="/" class="brand">Nico's Codex</a>
+  <span class="header-rule">Rule 78 — Knowledge is free</span>
+</header>
+
+<!-- ── BREADCRUMB ─────────────────────────────────────────────── -->
+<nav class="breadcrumb" aria-label="breadcrumb">
+  <a href="/">← All Sectors</a>
+  <span class="bc-sep">/</span>
+  <span>Sector_02</span>
+  <span class="bc-sep">/</span>
+  <span class="bc-cur">Scripting</span>
+</nav>
+
+<!-- ── MAIN ───────────────────────────────────────────────────── -->
+<main class="page-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="sector-label">02 / All Levels</p>
+    <h1># <span class="hl">Scripting</span></h1>
+    <p class="hero-sub">Curated resources for IT pros and developers. PowerShell, Bash, Python, and automation — from your first cmdlet to production-grade scripts. Everything here is free.</p>
+  </section>
+
+  <!-- ── SECTION: IT / MSP ──────────────────────────────────── -->
+  <div class="sub-header">
+    <span class="sub-pill pill-it">IT / MSP</span>
+    <span class="sub-title">PowerShell · Bash · RMM Automation</span>
+    <span class="sub-count">6 resources</span>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- Card 1 -->
+    <a href="https://learn.microsoft.com/en-us/powershell/scripting/learn/ps101/00-introduction"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+      <div class="card-top">
+        <span class="card-title">PowerShell 101 — Microsoft Learn</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">Microsoft's official PowerShell intro for IT pros. Covers pipeline, cmdlets, objects, remoting, and scripting fundamentals — core MSP skills.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Self-paced</span>
+          <span class="chip">Microsoft</span>
+          <span class="chip">PowerShell</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 2 -->
+    <a href="https://learn.microsoft.com/en-us/training/paths/powershell/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+      <div class="card-top">
+        <span class="card-title">PowerShell Learning Path — Microsoft Learn</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="card-desc">Structured path: automation patterns, error handling, Active Directory, registry, file system. Earns a Microsoft badge on completion.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Modules</span>
+          <span class="chip">Badge on completion</span>
+          <span class="chip">Microsoft</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 3 -->
+    <a href="https://ss64.com/ps/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+      <div class="card-top">
+        <span class="card-title">SS64 PowerShell Reference</span>
+        <span class="badge badge-all">All Levels</span>
+      </div>
+      <p class="card-desc">The fastest PowerShell command reference on the internet. Every cmdlet, every parameter. Bookmark it now.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Reference</span>
+          <span class="chip">Always current</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 4 -->
+    <a href="https://www.learnshell.org/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+      <div class="card-top">
+        <span class="card-title">LearnShell.org — Interactive Bash</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">Browser-based Bash lessons with zero setup. Variables, loops, functions, piping. The right starting point for macOS and Linux endpoint scripts.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Interactive</span>
+          <span class="chip">In-browser</span>
+          <span class="chip">Bash</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 5 -->
+    <a href="https://github.com/dattoInc/datto-rmm-scripts"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+      <div class="card-top">
+        <span class="card-title">Datto RMM Community Scripts — GitHub</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="card-desc">Community PowerShell scripts for Datto RMM: deployment, monitoring, and endpoint management used by MSPs in production.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Open Source</span>
+          <span class="chip">Datto RMM</span>
+          <span class="chip">PowerShell</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 6 -->
+    <a href="https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+      <div class="card-top">
+        <span class="card-title">PowerShell in VS Code — Official Guide</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">Set up VS Code as a PowerShell IDE: IntelliSense, integrated terminal, PSScriptAnalyzer linter. Stop using Notepad.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Setup Guide</span>
+          <span class="chip">Microsoft</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+  </div><!-- /card-grid IT -->
+
+  <!-- ── SECTION: DEV ────────────────────────────────────────── -->
+  <div class="sub-header">
+    <span class="sub-pill pill-dev">Dev</span>
+    <span class="sub-title">Python · JavaScript · Automation</span>
+    <span class="sub-count">6 resources</span>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- Card 7 -->
+    <a href="https://automatetheboringstuff.com/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:0ms">
+      <div class="card-top">
+        <span class="card-title">Automate the Boring Stuff with Python</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">The best free Python scripting book. File automation, spreadsheets, PDFs, web scraping, scheduled tasks. Read free online in full.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Full book online</span>
+          <span class="chip">Python</span>
+          <span class="chip">Al Sweigart</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 8 -->
+    <a href="https://realpython.com/tutorials/scripting/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:80ms">
+      <div class="card-top">
+        <span class="card-title">Real Python — Scripting Tutorials</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="card-desc">CLI tools, file I/O, subprocess, cron, API automation. For people who know some Python but want to script effectively.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Article series</span>
+          <span class="chip">Python</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 9 -->
+    <a href="https://javascript.info/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:160ms">
+      <div class="card-top">
+        <span class="card-title">The Modern JavaScript Tutorial</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">The most comprehensive free JS resource. Covers Node.js scripting, async/await, modules, and automation tooling end-to-end.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">javascript.info</span>
+          <span class="chip">JavaScript</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 10 -->
+    <a href="https://n8n.io/blog/learn-to-automate/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:240ms">
+      <div class="card-top">
+        <span class="card-title">n8n — Learn to Automate</span>
+        <span class="badge badge-all">All Levels</span>
+      </div>
+      <p class="card-desc">Open-source workflow automation. Webhooks, API chaining, scheduling, event triggers. Self-hostable alternative to Zapier.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Open Source</span>
+          <span class="chip">Automation</span>
+          <span class="chip">n8n</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 11 -->
+    <a href="https://docs.python.org/3/library/argparse.html"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:320ms">
+      <div class="card-top">
+        <span class="card-title">Python argparse — Official Docs</span>
+        <span class="badge badge-intermediate">Intermediate</span>
+      </div>
+      <p class="card-desc">Standard library for building real CLI tools. Makes your scripts reusable and shareable with other people and other machines.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Official Docs</span>
+          <span class="chip">Python</span>
+          <span class="chip">CLI</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+    <!-- Card 12 -->
+    <a href="https://www.freecodecamp.org/news/bash-scripting-tutorial-linux-shell-script-and-command-line-for-beginners/"
+       target="_blank" rel="noopener" class="r-card" style="animation-delay:400ms">
+      <div class="card-top">
+        <span class="card-title">Bash Scripting Full Course — freeCodeCamp</span>
+        <span class="badge badge-beginner">Beginner</span>
+      </div>
+      <p class="card-desc">Complete Bash guide: variables, conditionals, loops, functions, cron jobs. Solid foundation for building real automation pipelines.</p>
+      <div class="card-meta-row">
+        <div class="meta-chips">
+          <span class="chip chip-free">Free</span>
+          <span class="chip">Full course</span>
+          <span class="chip">freeCodeCamp</span>
+          <span class="chip">Bash</span>
+        </div>
+        <span class="card-open">Open →</span>
+      </div>
+    </a>
+
+  </div><!-- /card-grid Dev -->
+
+  <!-- ── FULL-WIDTH DIVIDER ──────────────────────────────────── -->
+  <hr class="full-divider">
+
+  <!-- ── TERMINAL INTRO ────────────────────────────────────────  -->
+  <section class="terminal-intro">
+    <p class="terminal-intro-label">Mission Terminal</p>
+    <h2>CODEX_OS <span class="hl">v2.4.1</span></h2>
+    <p>A text-based operative environment embedded directly in the Codex. Navigate two network sectors, neutralise threats, and extract data assets. No setup required — fully playable in-browser with keyboard or the buttons below.</p>
+  </section>
+
+  <!-- ── TERMINAL GAME ─────────────────────────────────────────  -->
+  <div class="codex-terminal" id="codex-terminal">
+
+    <!-- Fake OS titlebar -->
+    <div class="terminal-bar">
+      <span class="t-dot t-dot-r"></span>
+      <span class="t-dot t-dot-y"></span>
+      <span class="t-dot t-dot-g"></span>
+      <span class="terminal-title">CODEX_OS v2.4.1 — operative session</span>
+    </div>
+
+    <!-- Scrollable output -->
+    <div class="terminal-output" id="t-output" aria-live="polite" aria-label="Terminal output"></div>
+
+    <!-- Input row -->
+    <div class="terminal-input-row">
+      <span class="t-prompt">guest@codex:~$</span>
+      <input id="t-input" type="text" autocomplete="off" autocorrect="off"
+             autocapitalize="off" spellcheck="false" aria-label="Terminal input">
+    </div>
+
+    <!-- Clickable option buttons -->
+    <div class="t-btn-row" id="t-btn-row"></div>
+
+  </div><!-- /codex-terminal -->
+
+</main>
+
+<!-- ── SITE FOOTER ─────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <span class="footer-brand">Nico's Codex</span>
+  <div class="footer-right">
+    <nav class="footer-nav"><a href="/">← All Sectors</a></nav>
+    <span class="footer-date">Updated April 2026</span>
+    <span class="footer-tagline">Every resource is 100% free</span>
+  </div>
+</footer>
+
+<!-- ── TERMINAL GAME LOGIC ────────────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+
+  /* ── DOM refs ──────────────────────────────────────── */
+  var out    = document.getElementById('t-output');
+  var inp    = document.getElementById('t-input');
+  var btnRow = document.getElementById('t-btn-row');
+  var term   = document.getElementById('codex-terminal');
+
+  /* ── Static game data ──────────────────────────────── */
+  var ENEMIES = {
+    sentry_bot:      { name: 'SENTRY_BOT',      maxHp: 30, atk: 12, cred: 20 },
+    firewall_daemon: { name: 'FIREWALL_DAEMON',  maxHp: 45, atk: 18, cred: 35 },
+    iceman:          { name: 'ICEMAN',           maxHp: 60, atk: 25, cred: 50 }
+  };
+
+  var ITEMS = {
+    keycard_a:  { name: 'KEYCARD_A',  desc: 'Old security card. Might open something.',  cred: 0  },
+    tape_reel:  { name: 'TAPE_REEL',  desc: 'Magnetic tape. Recoverable data inside.',   cred: 15 },
+    root_token: { name: 'ROOT_TOKEN', desc: 'Root access token. Extremely high value.',  cred: 30 },
+    data_shard: { name: 'DATA_SHARD', desc: 'Encrypted data fragment.',                  cred: 20 }
+  };
+
+  var SECTOR_TEMPLATES = {
+    alpha: {
+      name: 'Abandoned Server Farm',
+      startRoom: 'entry',
+      rooms: {
+        entry: {
+          name: 'Entry Point',
+          desc: 'Rusted server racks. Emergency lighting flickers. A heavy door leads north.',
+          exits: { north: 'mainframe' },
+          items: ['keycard_a'],
+          enemy: null
+        },
+        mainframe: {
+          name: 'Mainframe Room',
+          desc: 'Banks of servers hum under red warning lights. Something patrols the aisles.',
+          exits: { south: 'entry', east: 'storage' },
+          items: [],
+          enemy: { id: 'sentry_bot', hp: 30 }
+        },
+        storage: {
+          name: 'Storage Bay',
+          desc: 'Rows of magnetic tape units. A disturbed rack holds something of value.',
+          exits: { west: 'mainframe' },
+          items: ['tape_reel'],
+          enemy: { id: 'firewall_daemon', hp: 45 }
+        }
+      }
+    },
+    beta: {
+      name: 'Deep Network Core',
+      startRoom: 'corridor',
+      rooms: {
+        corridor: {
+          name: 'Data Corridor',
+          desc: 'Fiber optic cables pulse with live data. A threat blocks the path north.',
+          exits: { north: 'core' },
+          items: [],
+          enemy: { id: 'sentry_bot', hp: 30 }
+        },
+        core: {
+          name: 'Network Core',
+          desc: 'Cooling fans roar. Root tokens locked in a case on the far wall. Guarded.',
+          exits: { south: 'corridor', east: 'vault' },
+          items: ['root_token'],
+          enemy: { id: 'firewall_daemon', hp: 45 }
+        },
+        vault: {
+          name: 'Data Vault',
+          desc: 'Reinforced chamber. Data shards glitter on the floor. ICEMAN stands watch.',
+          exits: { west: 'core' },
+          items: ['data_shard'],
+          enemy: { id: 'iceman', hp: 60 }
+        }
+      }
+    }
+  };
+
+  var MAPS = {
+    alpha: [
+      '  SECTOR ALPHA \u2014 Abandoned Server Farm',
+      '',
+      '  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510',
+      '  \u2502  ENTRY  \u2502 \u2500N\u2192 \u2502  MAINFRAME \u2502 \u2500E\u2192 \u2502 STORAGE \u2502',
+      '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2190S  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2190W  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518',
+      '',
+      '  Start room: ENTRY'
+    ],
+    beta: [
+      '  SECTOR BETA \u2014 Deep Network Core',
+      '',
+      '  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2510      \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510',
+      '  \u2502 CORRIDOR \u2502 \u2500N\u2192 \u2502 CORE \u2502 \u2500E\u2192 \u2502 VAULT \u2502',
+      '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2190S  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2518 \u2190W  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518',
+      '',
+      '  Start room: CORRIDOR'
+    ]
+  };
+
+  /* ── State ─────────────────────────────────────────── */
+  var s = {
+    started: false,
+    player: { hp: 100, maxHp: 100, cred: 0, inv: [] },
+    sector: null,
+    sectorId: null,
+    roomId: null,
+    cmdHistory: [],
+    histIdx: -1
+  };
+
+  function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+  function resetState() {
+    s.started  = false;
+    s.player   = { hp: 100, maxHp: 100, cred: 0, inv: [] };
+    s.sector   = null;
+    s.sectorId = null;
+    s.roomId   = null;
+  }
+
+  /* ── Output helpers ────────────────────────────────── */
+  function print(text, cls) {
+    var span = document.createElement('span');
+    span.className = 't-line' + (cls ? ' t-' + cls : '');
+    span.textContent = text;
+    out.appendChild(span);
+    out.appendChild(document.createTextNode('\n'));
+    out.scrollTop = out.scrollHeight;
+  }
+
+  function blank() { print(''); }
+
+  function printCmd(text) { print('guest@codex:~$ ' + text, 'cmd'); }
+
+  /* ── Button helpers ────────────────────────────────── */
+  function setButtons(list) {
+    btnRow.innerHTML = '';
+    list.forEach(function (item) {
+      var btn = document.createElement('button');
+      btn.className = 't-btn';
+      btn.textContent = item.label || item.cmd.toUpperCase();
+      btn.onclick = function () { runCommand(item.cmd); };
+      btnRow.appendChild(btn);
+    });
+  }
+
+  /* ── Boot sequence ─────────────────────────────────── */
+  var BOOT_LINES = [
+    { text: '\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', cls: 'sys', delay: 100 },
+    { text: '\u2502   CODEX_OS v2.4.1 \u2014 operative session    \u2502', cls: 'sys', delay: 50  },
+    { text: '\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', cls: 'sys', delay: 80  },
+    { blank: true, delay: 150 },
+    { text: '[BOOT] Initializing CODEX_OS v2.4.1...',                    cls: 'dim', delay: 280 },
+    { text: '[BOOT] Mounting virtual filesystem ......... OK',           cls: 'dim', delay: 320 },
+    { text: '[BOOT] Loading operative profile ........... OK',           cls: 'dim', delay: 300 },
+    { text: '[BOOT] Scanning sectors: alpha, beta ....... OK',           cls: 'dim', delay: 360 },
+    { text: '[BOOT] Security clearance: OPERATIVE ....... OK',           cls: 'dim', delay: 300 },
+    { blank: true, delay: 220 },
+    { text: 'Welcome, Operative.',                                        cls: 'sys',  delay: 320 },
+    { text: 'Infiltrate the network. Extract data assets. Survive.',     cls: 'info', delay: 80  },
+    { blank: true, delay: 120 },
+    { text: "Type 'start' to begin, or 'help' for all commands.",        cls: 'dim',  delay: 220 },
+    { blank: true, delay: 0, btns: [
+      { cmd: 'start', label: 'START GAME' },
+      { cmd: 'help',  label: 'HELP'       },
+      { cmd: 'about', label: 'ABOUT'      }
+    ]}
+  ];
+
+  function boot() {
+    var total = 0;
+    BOOT_LINES.forEach(function (line) {
+      total += line.delay;
+      (function (l, t) {
+        setTimeout(function () {
+          if (l.blank) { blank(); }
+          else         { print(l.text, l.cls); }
+          if (l.btns)  { setButtons(l.btns); inp.focus(); }
+        }, t);
+      }(line, total));
+    });
+  }
+
+  /* ── Room helpers ──────────────────────────────────── */
+  function curRoom() {
+    return s.sector && s.sector.rooms[s.roomId];
+  }
+
+  function hpBar(hp, max) {
+    var filled = Math.round((hp / max) * 10);
+    return '[\u2588'.repeat(filled) + '\u2591'.repeat(10 - filled) + ']';
+  }
+
+  function describeRoom() {
+    var room = curRoom();
+    if (!room) { print("Not in a sector. Type 'enter alpha' or 'enter beta'.", 'err'); return; }
+    print('[' + s.sectorId.toUpperCase() + ' / ' + room.name.toUpperCase() + ']', 'sys');
+    print(room.desc, 'info');
+    blank();
+    if (room.items.length > 0) {
+      print('Items : ' + room.items.map(function (id) { return ITEMS[id].name; }).join(', '), 'warn');
+    }
+    print('Exits : ' + Object.keys(room.exits).join(', '), 'dim');
+    if (room.enemy && room.enemy.hp > 0) {
+      var e = ENEMIES[room.enemy.id];
+      blank();
+      print('\u26a0 THREAT: ' + e.name + '  HP:' + room.enemy.hp + '/' + e.maxHp + '  ATK:' + e.atk, 'err');
+    }
+    blank();
+    refreshButtons();
+  }
+
+  function refreshButtons() {
+    var room = curRoom();
+    if (!room) return;
+    var list = [];
+    var hasEnemy = room.enemy && room.enemy.hp > 0;
+    if (hasEnemy) {
+      list.push({ cmd: 'attack', label: 'ATTACK' });
+    } else {
+      Object.keys(room.exits).forEach(function (dir) {
+        list.push({ cmd: 'go ' + dir, label: 'GO ' + dir.toUpperCase() });
+      });
+    }
+    room.items.forEach(function (id) {
+      list.push({ cmd: 'take ' + id, label: 'TAKE ' + ITEMS[id].name });
+    });
+    list.push({ cmd: 'status', label: 'STATUS' });
+    if (s.player.cred >= 10 && s.player.hp < s.player.maxHp) {
+      list.push({ cmd: 'heal', label: 'HEAL (10 CRED)' });
+    }
+    list.push({ cmd: 'map', label: 'MAP' });
+    setButtons(list);
+  }
+
+  /* ── Command handlers ──────────────────────────────── */
+  function cmdStart() {
+    s.started = true;
+    blank();
+    print('MISSION BRIEFING', 'sys');
+    print('\u2500'.repeat(44), 'dim');
+    print('Two sectors flagged for infiltration.', 'info');
+    print('Defeat all threats. Extract all data assets.', 'info');
+    blank();
+    print('  SECTOR ALPHA \u2014 Abandoned Server Farm   [3 rooms]', 'warn');
+    print('  SECTOR BETA  \u2014 Deep Network Core       [3 rooms]', 'warn');
+    blank();
+    print("Heals cost 10 CRED and restore 25 HP.", 'dim');
+    print("Use items from inventory for extra credits.", 'dim');
+    blank();
+    setButtons([
+      { cmd: 'enter alpha', label: 'ENTER ALPHA' },
+      { cmd: 'enter beta',  label: 'ENTER BETA'  },
+      { cmd: 'sectors',     label: 'SECTORS'     }
+    ]);
+  }
+
+  function cmdHelp() {
+    blank();
+    print('AVAILABLE COMMANDS', 'sys');
+    print('\u2500'.repeat(44), 'dim');
+    var cmds = [
+      ['start',           'Begin the mission'],
+      ['help',            'Show this list'],
+      ['about',           'About this terminal'],
+      ['look / ls',       'Describe current room'],
+      ['go [dir]',        'Move: north south east west'],
+      ['attack / atk',    'Attack the enemy in the room'],
+      ['take [item]',     'Pick up an item'],
+      ['use [item]',      'Use an item from inventory'],
+      ['inv',             'Show inventory'],
+      ['status / stat',   'Show HP, CRED, location'],
+      ['map',             'ASCII map of current sector'],
+      ['sectors',         'List available sectors'],
+      ['enter [sector]',  'Enter a sector: alpha or beta'],
+      ['heal',            'Spend 10 CRED, restore 25 HP'],
+      ['clear',           'Clear the terminal'],
+      ['exit',            'Return to main menu']
+    ];
+    cmds.forEach(function (row) {
+      print('  ' + (row[0] + '              ').slice(0, 18) + row[1], 'dim');
+    });
+    blank();
+  }
+
+  function cmdAbout() {
+    blank();
+    print('CODEX_OS v2.4.1', 'sys');
+    print('\u2500'.repeat(44), 'dim');
+    print("This terminal is part of Nico's Codex \u2014", 'info');
+    print('a free knowledge base for IT pros and developers.', 'info');
+    blank();
+    print('The game is the bonus. The 12 resources above', 'dim');
+    print('are the actual mission.', 'dim');
+    blank();
+  }
+
+  function cmdSectors() {
+    blank();
+    print('AVAILABLE SECTORS', 'sys');
+    print('\u2500'.repeat(44), 'dim');
+    print('  alpha  \u2014 Abandoned Server Farm   [3 rooms]', 'warn');
+    print('  beta   \u2014 Deep Network Core       [3 rooms]', 'warn');
+    blank();
+    print("Type: enter alpha  OR  enter beta", 'dim');
+    blank();
+    setButtons([
+      { cmd: 'enter alpha', label: 'ENTER ALPHA' },
+      { cmd: 'enter beta',  label: 'ENTER BETA'  }
+    ]);
+  }
+
+  function cmdEnter(id) {
+    if (!id || !SECTOR_TEMPLATES[id]) {
+      print('Unknown sector. Try: alpha, beta', 'err');
+      return;
+    }
+    s.sector   = clone(SECTOR_TEMPLATES[id]);
+    s.sectorId = id;
+    s.roomId   = s.sector.startRoom;
+    blank();
+    print('ENTERING SECTOR ' + id.toUpperCase(), 'sys');
+    print(s.sector.name, 'warn');
+    print('\u2500'.repeat(44), 'dim');
+    blank();
+    describeRoom();
+  }
+
+  function cmdLook() {
+    if (!s.sector) { print("Not in a sector. Use 'enter [sector]'.", 'err'); return; }
+    describeRoom();
+  }
+
+  function cmdGo(dir) {
+    if (!s.sector) { print("Not in a sector. Use 'enter [sector]'.", 'err'); return; }
+    var room = curRoom();
+    if (room.enemy && room.enemy.hp > 0) {
+      print('BLOCKED: ' + ENEMIES[room.enemy.id].name + ' guards the way. Defeat it first.', 'err');
+      return;
+    }
+    if (!dir || !room.exits[dir]) {
+      print('No exit to the ' + (dir || '?') + '.', 'err');
+      return;
+    }
+    s.roomId = room.exits[dir];
+    blank();
+    print('Moving ' + dir + '...', 'dim');
+    blank();
+    describeRoom();
+  }
+
+  function cmdAttack() {
+    if (!s.sector) { print("Not in a sector.", 'err'); return; }
+    var room = curRoom();
+    if (!room.enemy || room.enemy.hp <= 0) {
+      print('No active threat in this room.', 'warn');
+      return;
+    }
+    var eData = ENEMIES[room.enemy.id];
+    var pdmg  = Math.floor(Math.random() * 15) + 10;
+    room.enemy.hp = Math.max(0, room.enemy.hp - pdmg);
+    blank();
+    print('You strike ' + eData.name + ' for ' + pdmg + ' damage.', 'sys');
+    print(eData.name + ' HP: ' + room.enemy.hp + '/' + eData.maxHp, 'warn');
+    if (room.enemy.hp <= 0) {
+      s.player.cred += eData.cred;
+      blank();
+      print(eData.name + ' eliminated.  +' + eData.cred + ' CRED', 'sys');
+      print('Total CRED: ' + s.player.cred, 'info');
+      blank();
+      describeRoom();
+      return;
+    }
+    var edamage = eData.atk;
+    s.player.hp = Math.max(0, s.player.hp - edamage);
+    blank();
+    print(eData.name + ' retaliates for ' + edamage + ' damage.', 'err');
+    print('Your HP: ' + s.player.hp + '/' + s.player.maxHp, 'warn');
+    blank();
+    if (s.player.hp <= 0) { showDeath(); }
+    else { refreshButtons(); }
+  }
+
+  function cmdTake(itemId) {
+    if (!s.sector) { print("Not in a sector.", 'err'); return; }
+    if (!itemId)   { print('Specify item name.', 'err'); return; }
+    var room = curRoom();
+    var idx  = room.items.indexOf(itemId.toLowerCase());
+    if (idx === -1) { print("Item '" + itemId + "' not found here.", 'err'); return; }
+    room.items.splice(idx, 1);
+    s.player.inv.push(itemId.toLowerCase());
+    print('Picked up: ' + ITEMS[itemId.toLowerCase()].name, 'sys');
+    refreshButtons();
+  }
+
+  function cmdUse(itemId) {
+    if (!itemId) { print('Specify item name.', 'err'); return; }
+    var id  = itemId.toLowerCase();
+    var idx = s.player.inv.indexOf(id);
+    if (idx === -1) { print("'" + itemId + "' not in inventory.", 'err'); return; }
+    var item = ITEMS[id];
+    if (!item) { print('Unknown item.', 'err'); return; }
+    if (item.cred > 0) {
+      s.player.inv.splice(idx, 1);
+      s.player.cred += item.cred;
+      print(item.name + ' used.  +' + item.cred + ' CRED  (Total: ' + s.player.cred + ')', 'sys');
+    } else {
+      print(item.name + ': ' + item.desc, 'info');
+    }
+  }
+
+  function cmdInv() {
+    blank();
+    if (s.player.inv.length === 0) {
+      print('Inventory: empty', 'dim');
+    } else {
+      print('INVENTORY', 'sys');
+      s.player.inv.forEach(function (id) {
+        var item = ITEMS[id];
+        if (!item) return;
+        var note = item.cred > 0 ? '  (+' + item.cred + ' CRED on use)' : '';
+        print('  ' + item.name + note, 'dim');
+      });
+    }
+    blank();
+  }
+
+  function cmdStatus() {
+    blank();
+    print('OPERATIVE STATUS', 'sys');
+    print('\u2500'.repeat(44), 'dim');
+    print('HP   : ' + hpBar(s.player.hp, s.player.maxHp) + '  ' + s.player.hp + '/' + s.player.maxHp, 'warn');
+    print('CRED : ' + s.player.cred, 'info');
+    var invStr = s.player.inv.length === 0
+      ? 'empty'
+      : s.player.inv.map(function (id) { return ITEMS[id] ? ITEMS[id].name : id; }).join(', ');
+    print('INV  : ' + invStr, 'dim');
+    if (s.sectorId) {
+      var room = curRoom();
+      print('LOC  : ' + s.sectorId.toUpperCase() + ' / ' + (room ? room.name : '?'), 'dim');
+    }
+    blank();
+  }
+
+  function cmdMap() {
+    if (!s.sectorId) { print("Not in a sector. Use 'enter [sector]'.", 'err'); return; }
+    blank();
+    MAPS[s.sectorId].forEach(function (line) { print(line, 'dim'); });
+    blank();
+    var room = curRoom();
+    if (room) print('You are: ' + room.name.toUpperCase(), 'sys');
+    blank();
+  }
+
+  function cmdHeal() {
+    if (s.player.cred < 10)           { print('Need 10 CRED to heal. Have: ' + s.player.cred + '.', 'err'); return; }
+    if (s.player.hp >= s.player.maxHp) { print('HP already at maximum.', 'warn'); return; }
+    s.player.cred -= 10;
+    var prev = s.player.hp;
+    s.player.hp = Math.min(s.player.maxHp, s.player.hp + 25);
+    print('Healed +' + (s.player.hp - prev) + ' HP  (' + s.player.hp + '/' + s.player.maxHp + ')  -10 CRED', 'sys');
+    if (s.sector) refreshButtons();
+  }
+
+  function cmdExit() {
+    resetState();
+    blank();
+    print('Session terminated. Returning to menu...', 'dim');
+    blank();
+    print("Type 'start' to begin a new session.", 'sys');
+    setButtons([
+      { cmd: 'start', label: 'START GAME' },
+      { cmd: 'help',  label: 'HELP'       }
+    ]);
+  }
+
+  function cmdRestart() {
+    resetState();
+    blank();
+    print('Reinitializing operative profile...', 'dim');
+    blank();
+    cmdStart();
+  }
+
+  function cmdClear() { out.innerHTML = ''; }
+
+  function showDeath() {
+    blank();
+    print('\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557', 'err');
+    print('\u2551         \u2588\u2588 FLATLINED \u2588\u2588         \u2551', 'err');
+    print('\u2551   HP: 0 / 100 \u2014 Operative eliminated.   \u2551', 'err');
+    print('\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d', 'err');
+    blank();
+    print('The network has neutralized your signature.', 'dim');
+    blank();
+    setButtons([
+      { cmd: 'restart', label: 'RESTART' },
+      { cmd: 'exit',    label: 'MAIN MENU' }
+    ]);
+  }
+
+  /* ── Command dispatcher ────────────────────────────── */
+  function runCommand(raw) {
+    var trimmed = raw.trim();
+    if (!trimmed) return;
+    s.cmdHistory.unshift(trimmed);
+    s.histIdx = -1;
+    if (trimmed !== 'clear') printCmd(trimmed);
+    var parts = trimmed.toLowerCase().split(/\s+/);
+    var cmd   = parts[0];
+    var arg   = parts.slice(1).join(' ');
+
+    switch (cmd) {
+      case 'start':    cmdStart();         break;
+      case 'help':     cmdHelp();          break;
+      case 'about':    cmdAbout();         break;
+      case 'look':
+      case 'ls':       cmdLook();          break;
+      case 'go':       cmdGo(arg);         break;
+      case 'attack':
+      case 'atk':      cmdAttack();        break;
+      case 'take':     cmdTake(arg);       break;
+      case 'use':      cmdUse(arg);        break;
+      case 'inv':      cmdInv();           break;
+      case 'status':
+      case 'stat':     cmdStatus();        break;
+      case 'map':      cmdMap();           break;
+      case 'sectors':  cmdSectors();       break;
+      case 'enter':    cmdEnter(arg);      break;
+      case 'heal':     cmdHeal();          break;
+      case 'clear':    cmdClear();         break;
+      case 'restart':  cmdRestart();       break;
+      case 'exit':     cmdExit();          break;
+      default:
+        print("Unknown command: '" + cmd + "'. Type 'help' for commands.", 'err');
+    }
+  }
+
+  /* ── Input events ──────────────────────────────────── */
+  inp.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      var val = inp.value;
+      inp.value = '';
+      runCommand(val);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (s.cmdHistory.length > 0) {
+        s.histIdx = Math.min(s.histIdx + 1, s.cmdHistory.length - 1);
+        inp.value = s.cmdHistory[s.histIdx];
+        setTimeout(function () { inp.selectionStart = inp.selectionEnd = inp.value.length; }, 0);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (s.histIdx > 0) {
+        s.histIdx--;
+        inp.value = s.cmdHistory[s.histIdx];
+      } else {
+        s.histIdx = -1;
+        inp.value = '';
+      }
+    }
+  });
+
+  term.addEventListener('click', function (e) {
+    if (e.target !== inp && e.target.tagName !== 'BUTTON') inp.focus();
+  });
+
+  /* ── Boot ──────────────────────────────────────────── */
+  boot();
+
+}());
+</script>
+</body>
+</html>
