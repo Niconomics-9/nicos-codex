@@ -161,6 +161,31 @@ html, body {
 /* ── Mobile list — hidden everywhere, canvas is the UI ── */
 #mobile-list { display: none; }
 
+/* ── Motion permission bar (iOS only) ── */
+#motion-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #7de8ff;
+  background: rgba(3,5,10,0.6);
+  border-bottom: 1px solid rgba(125,232,255,0.08);
+  backdrop-filter: blur(12px);
+  padding: 0.5rem 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#motion-bar.dismissed {
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
 @media (max-width: 700px) {
   .corner { display: none; }
 }
@@ -169,6 +194,8 @@ html, body {
 <body>
 
 <canvas id="canvas"></canvas>
+
+<div id="motion-bar" class="dismissed">Enable motion →</div>
 
 <div id="intro">
   <h1 class="intro-title">Nico's Codex</h1>
@@ -289,10 +316,11 @@ class Orb {
     this.driftPhX  = Math.random() * Math.PI * 2;
     this.driftPhY  = Math.random() * Math.PI * 2;
 
-    this.hovered     = false;
-    this.scale       = 1;
-    this.clickPulse  = 0;
-    this.clickTarget = null;
+    this.hovered       = false;
+    this.scale         = 1;
+    this.clickPulse    = 0;
+    this.clickTarget   = null;
+    this.parallaxDepth = 0.6 + Math.random() * 0.6;
   }
 
   rebase() {
@@ -427,6 +455,55 @@ canvas.addEventListener('touchend', e => {
   setTimeout(() => { mx = -9999; my = -9999; }, 600);
 });
 
+// ── Motion system ────────────────────────────────────────────────
+let gyroActive   = false;
+let gyroTargetX  = 0, gyroTargetY  = 0;
+let gyroCurrentX = 0, gyroCurrentY = 0;
+const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+function onOrient(e) {
+  if (!gyroActive) return;
+  gyroTargetX = Math.max(-20, Math.min(20, (e.gamma  || 0) * 0.65));
+  gyroTargetY = Math.max(-20, Math.min(20, ((e.beta  || 0) - 90) * 0.65));
+}
+window.addEventListener('deviceorientation', onOrient);
+
+function activateGyro() { gyroActive = true; }
+
+const motionBar      = document.getElementById('motion-bar');
+const IS_IOS         = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const needsPermission = IS_IOS
+  && typeof DeviceMotionEvent !== 'undefined'
+  && typeof DeviceMotionEvent.requestPermission === 'function';
+
+function dismissBar() {
+  motionBar.classList.add('dismissed');
+  setTimeout(() => { motionBar.style.display = 'none'; }, 550);
+}
+
+if (needsPermission) {
+  if (localStorage.getItem('motion-granted') === '1') {
+    activateGyro();
+  } else {
+    motionBar.classList.remove('dismissed');
+    motionBar.addEventListener('click', async () => {
+      try {
+        const res = await DeviceMotionEvent.requestPermission();
+        if (res === 'granted') {
+          localStorage.setItem('motion-granted', '1');
+          activateGyro();
+        }
+      } catch (_) { /* denied — float fallback */ }
+      dismissBar();
+    });
+  }
+} else {
+  // Android, desktop, or iOS < 13 — auto-activate on first real event
+  window.addEventListener('deviceorientation', function autoActivate(e) {
+    if (e.gamma !== null && !gyroActive) activateGyro();
+  });
+}
+
 // ── Intro fade ────────────────────────────────────────────────────
 let introHidden = false;
 const intro = document.getElementById('intro');
@@ -545,10 +622,22 @@ function render() {
   // Particles
   for (const p of particles) { p.update(); p.draw(ctx); }
 
+  // Compute parallax / gyro offset
+  let offsetX = 0, offsetY = 0;
+  if (gyroActive) {
+    gyroCurrentX += (gyroTargetX - gyroCurrentX) * 0.22;
+    gyroCurrentY += (gyroTargetY - gyroCurrentY) * 0.22;
+    offsetX = gyroCurrentX;
+    offsetY = gyroCurrentY;
+  } else if (hasMouse && mx > -100) {
+    offsetX = ((mx - W / 2) / (W / 2)) * 8;
+    offsetY = ((my - H / 2) / (H / 2)) * 8;
+  }
+
   // Drift positions
   for (const o of orbs) {
-    o.x = o.baseX + Math.sin(t * o.driftSpX + o.driftPhX) * o.driftAmpX;
-    o.y = o.baseY + Math.cos(t * o.driftSpY + o.driftPhY) * o.driftAmpY;
+    o.x = o.baseX + Math.sin(t * o.driftSpX + o.driftPhX) * o.driftAmpX + offsetX * o.parallaxDepth;
+    o.y = o.baseY + Math.cos(t * o.driftSpY + o.driftPhY) * o.driftAmpY + offsetY * o.parallaxDepth;
   }
 
   // Hover detection
