@@ -41,7 +41,6 @@ html, body {
   z-index: 10;
   gap: 0.65rem;
 }
-#intro.hidden .intro-subtitle { opacity: 0; }
 
 .intro-eyebrow {
   font-family: 'Syne', sans-serif;
@@ -308,14 +307,23 @@ class Orb {
     this.radius = this.baseRadius;
 
     this.phase      = Math.random() * Math.PI * 2;
-    this.pulseSpeed = 0.22 + Math.random() * 0.28;
+    this.pulseSpeed = 5.0 + Math.random() * 3.0;  // 4–7s size breath
 
-    this.driftAmpX = 18 + Math.random() * 22;
-    this.driftAmpY = 14 + Math.random() * 18;
-    this.driftSpX  = 0.06 + Math.random() * 0.07;
-    this.driftSpY  = 0.05 + Math.random() * 0.06;
+    // Primary drift — 5–8s cycles, 14–26px amplitude
+    this.driftAmpX = 14 + Math.random() * 12;
+    this.driftAmpY = 12 + Math.random() * 10;
+    this.driftSpX  = 4.5 + Math.random() * 4.0;
+    this.driftSpY  = 4.0 + Math.random() * 3.5;
     this.driftPhX  = Math.random() * Math.PI * 2;
     this.driftPhY  = Math.random() * Math.PI * 2;
+
+    // Secondary wobble — 2–3.5s cycles, 3–6px — organic texture
+    this.wobbleAmpX = 3 + Math.random() * 3;
+    this.wobbleAmpY = 3 + Math.random() * 3;
+    this.wobbleSpX  = 11 + Math.random() * 8;
+    this.wobbleSpY  = 13 + Math.random() * 7;
+    this.wobblePhX  = Math.random() * Math.PI * 2;
+    this.wobblePhY  = Math.random() * Math.PI * 2;
 
     this.hovered       = false;
     this.scale         = 1;
@@ -637,8 +645,14 @@ function render() {
 
   // Drift positions
   for (const o of orbs) {
-    o.x = o.baseX + Math.sin(t * o.driftSpX + o.driftPhX) * o.driftAmpX + offsetX * o.parallaxDepth;
-    o.y = o.baseY + Math.cos(t * o.driftSpY + o.driftPhY) * o.driftAmpY + offsetY * o.parallaxDepth;
+    o.x = o.baseX
+      + Math.sin(t * o.driftSpX + o.driftPhX) * o.driftAmpX
+      + Math.sin(t * o.wobbleSpX + o.wobblePhX) * o.wobbleAmpX
+      + offsetX * o.parallaxDepth;
+    o.y = o.baseY
+      + Math.cos(t * o.driftSpY + o.driftPhY) * o.driftAmpY
+      + Math.cos(t * o.wobbleSpY + o.wobblePhY) * o.wobbleAmpY
+      + offsetY * o.parallaxDepth;
   }
 
   // Hover detection
@@ -656,7 +670,7 @@ function render() {
     let targetScale = o.hovered ? 1.5 : 1;
     if (o.clickPulse > 0) targetScale = 1 + o.clickPulse * 0.85;
     o.scale  += (targetScale - o.scale) * 0.1;
-    const pulse = 1 + Math.sin(t * o.pulseSpeed + o.phase) * 0.052;
+    const pulse = 1 + Math.sin(t * o.pulseSpeed + o.phase) * 0.08;
     o.radius = o.baseRadius * o.scale * pulse;
 
     if (o.clickPulse > 0) {
