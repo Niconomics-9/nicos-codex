@@ -11,6 +11,159 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+/* ── Neural network container ── */
+.nn-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#nnCanvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── Nodes ── */
+.nn-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  z-index: 10;
+  gap: 5px;
+}
+
+.nn-node[data-level="beginner"]     { --c:#4fd1c5; --cd:rgba(79,209,197,0.42);  --cg:rgba(79,209,197,0.14); }
+.nn-node[data-level="intermediate"] { --c:#3a7bd5; --cd:rgba(58,123,213,0.42);  --cg:rgba(58,123,213,0.14); }
+.nn-node[data-level="advanced"]     { --c:#a07de0; --cd:rgba(160,125,224,0.42); --cg:rgba(160,125,224,0.14); }
+.nn-node[data-level="all"]          { --c:#d4a84b; --cd:rgba(212,168,75,0.42);  --cg:rgba(212,168,75,0.14); }
+
+.nn-ring {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cd);
+  background: rgba(8,14,42,0.93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px var(--cg), inset 0 0 10px var(--cg);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.nn-node:hover .nn-ring,
+.nn-node:focus-visible .nn-ring {
+  border-color: var(--c);
+  box-shadow: 0 0 26px var(--cg), 0 0 50px var(--cg), inset 0 0 14px var(--cg);
+}
+
+.nn-num {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--c);
+  opacity: 0.65;
+  transition: opacity 0.2s;
+}
+.nn-node:hover .nn-num { opacity: 1; }
+
+.nn-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: rgba(200,224,255,0.58);
+  text-align: center;
+  line-height: 1.45;
+  max-width: 80px;
+  transition: color 0.2s;
+}
+.nn-node:hover .nn-label { color: rgba(200,224,255,0.9); }
+
+.nn-meta {
+  font-size: 7px;
+  letter-spacing: 0.07em;
+  color: rgba(200,224,255,0.2);
+  text-align: center;
+  font-family: system-ui, sans-serif;
+}
+
+/* ── Layer labels ── */
+.nn-layer-label {
+  position: absolute;
+  top: 12px;
+  transform: translateX(-50%);
+  font-family: 'Cinzel', serif;
+  font-size: 7.5px;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(100,160,255,0.28);
+  pointer-events: none;
+  user-select: none;
+  z-index: 5;
+}
+
+/* ── Tooltip ── */
+#nnTooltip {
+  position: absolute;
+  z-index: 30;
+  background: rgba(8,14,42,0.95);
+  border: 1px solid rgba(100,160,255,0.18);
+  backdrop-filter: blur(12px);
+  padding: 0.65rem 0.85rem 0.7rem;
+  width: 188px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+#nnTooltip.visible { opacity: 1; }
+
+.tt-nn-name {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(200,224,255,0.95);
+  margin-bottom: 5px;
+}
+.tt-nn-desc {
+  font-size: 8.5px;
+  color: rgba(200,224,255,0.46);
+  line-height: 1.5;
+  margin-bottom: 7px;
+  font-family: system-ui, sans-serif;
+}
+.tt-nn-badge {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border: 1px solid;
+  border-radius: 1px;
+}
+
+/* ── Mobile fallback ── */
+.nn-mobile { display: none; }
+
+@media (max-width: 640px) {
+  body { height: auto; }
+  .nn-wrap { display: none; }
+  .nn-mobile { display: block; padding: 0 1rem 1.5rem; }
+}
+</style>
 </head>
 <body>
 
@@ -23,106 +176,84 @@
   <span class="codex-rule">Updated April 2026</span>
 </nav>
 
-<p class="grid-eyebrow">Select a section to begin</p>
+<div class="nn-wrap" id="nnWrap">
+  <canvas id="nnCanvas"></canvas>
+  <div id="nnTooltip">
+    <div class="tt-nn-name"></div>
+    <div class="tt-nn-desc"></div>
+    <div class="tt-nn-badge"></div>
+  </div>
+</div>
 
-<div class="section-grid">
-
-  <a href="foundations.html" class="card" data-level="beginner">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-beginner">Beginner</span></div>
-      <div class="card-title">AI Foundations</div>
-      <div class="card-msg">What AI is, how it works — no coding or math required.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">01</span>
-      <span class="card-meta">4 resources · ~10 hrs</span>
-    </div>
-  </a>
-
-  <a href="prompting.html" class="card" data-level="beginner">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-beginner">Beginner</span></div>
-      <div class="card-title">Prompting &amp; Tools</div>
-      <div class="card-msg">The highest-leverage AI skill. Learn to get great results.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">02</span>
-      <span class="card-meta">5 resources · self-paced</span>
-    </div>
-  </a>
-
-  <a href="building.html" class="card" data-level="intermediate">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-intermediate">Intermediate</span></div>
-      <div class="card-title">Build with AI</div>
-      <div class="card-msg">Agents, automations, real projects. Claude Code lives here.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">03</span>
-      <span class="card-meta">7 resources · self-paced</span>
-    </div>
-  </a>
-
-  <a href="advanced.html" class="card" data-level="advanced">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-advanced">Advanced</span></div>
-      <div class="card-title">Go Deep</div>
-      <div class="card-msg">Neural nets, transformers, LLMs. Full technical picture.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">04</span>
-      <span class="card-meta">5 resources · 60+ hrs</span>
-    </div>
-  </a>
-
-  <a href="podcasts.html" class="card" data-level="all">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
-      <div class="card-title">Podcasts</div>
-      <div class="card-msg">Long-form and snackable listens to keep you current.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">05</span>
-      <span class="card-meta">7 podcasts · ongoing</span>
-    </div>
-  </a>
-
-  <a href="leaders-in-ai.html" class="card" data-level="all">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
-      <div class="card-title">Leaders in AI</div>
-      <div class="card-msg">The researchers and founders shaping what comes next.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">06</span>
-      <span class="card-meta">10 leaders · free</span>
-    </div>
-  </a>
-
-  <a href="newsletters.html" class="card" data-level="all">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
-      <div class="card-title">Newsletters</div>
-      <div class="card-msg">High-signal AI newsletters I actually open. No spam.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">07</span>
-      <span class="card-meta">5 newsletters · free</span>
-    </div>
-  </a>
-
-  <a href="repos.html" class="card" data-level="intermediate">
-    <div class="card-top">
-      <div class="card-badge"><span class="badge badge-intermediate">Intermediate</span></div>
-      <div class="card-title">GitHub Repos</div>
-      <div class="card-msg">Hands-on repos built for people who want to build.</div>
-    </div>
-    <div class="card-bottom">
-      <span class="card-num">08</span>
-      <span class="card-meta">5 repos · open source</span>
-    </div>
-  </a>
-
+<!-- Mobile fallback: 2-col card grid -->
+<div class="nn-mobile">
+  <p class="grid-eyebrow" style="margin-top:1.2rem;">Select a section to begin</p>
+  <div class="section-grid" style="grid-template-columns:repeat(2,1fr);">
+    <a href="foundations.html" class="card" data-level="beginner">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-beginner">Beginner</span></div>
+        <div class="card-title">AI Foundations</div>
+        <div class="card-msg">What AI is, how it works — no coding required.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">01</span><span class="card-meta">4 resources · ~10 hrs</span></div>
+    </a>
+    <a href="prompting.html" class="card" data-level="beginner">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-beginner">Beginner</span></div>
+        <div class="card-title">Prompting &amp; Tools</div>
+        <div class="card-msg">The highest-leverage AI skill.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">02</span><span class="card-meta">5 resources · self-paced</span></div>
+    </a>
+    <a href="building.html" class="card" data-level="intermediate">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-intermediate">Intermediate</span></div>
+        <div class="card-title">Build with AI</div>
+        <div class="card-msg">Agents, automations, real projects.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">03</span><span class="card-meta">7 resources · self-paced</span></div>
+    </a>
+    <a href="advanced.html" class="card" data-level="advanced">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-advanced">Advanced</span></div>
+        <div class="card-title">Go Deep</div>
+        <div class="card-msg">Neural nets, transformers, LLMs.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">04</span><span class="card-meta">5 resources · 60+ hrs</span></div>
+    </a>
+    <a href="podcasts.html" class="card" data-level="all">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
+        <div class="card-title">Podcasts</div>
+        <div class="card-msg">Listens to keep you current.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">05</span><span class="card-meta">7 podcasts · ongoing</span></div>
+    </a>
+    <a href="leaders-in-ai.html" class="card" data-level="all">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
+        <div class="card-title">Leaders in AI</div>
+        <div class="card-msg">The researchers shaping what comes next.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">06</span><span class="card-meta">10 leaders · free</span></div>
+    </a>
+    <a href="newsletters.html" class="card" data-level="all">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-all">All Levels</span></div>
+        <div class="card-title">Newsletters</div>
+        <div class="card-msg">High-signal newsletters I actually open.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">07</span><span class="card-meta">5 newsletters · free</span></div>
+    </a>
+    <a href="repos.html" class="card" data-level="intermediate">
+      <div class="card-top">
+        <div class="card-badge"><span class="badge badge-intermediate">Intermediate</span></div>
+        <div class="card-title">GitHub Repos</div>
+        <div class="card-msg">Repos built for people who want to build.</div>
+      </div>
+      <div class="card-bottom"><span class="card-num">08</span><span class="card-meta">5 repos · open source</span></div>
+    </a>
+  </div>
 </div>
 
 <footer class="codex-footer-bar">
@@ -130,5 +261,207 @@
   <span class="footer-tagline">Free. Curated. No paywalls.</span>
 </footer>
 
+<script>
+const NODES = [
+  { num:"01", label:"AI Foundations",    url:"foundations.html",   level:"beginner",    fx:0.13, fy:0.50, meta:"4 resources · ~10 hrs",   desc:"What AI is, how it works — no coding or math required.", badge:"Beginner" },
+  { num:"02", label:"Prompting & Tools", url:"prompting.html",     level:"beginner",    fx:0.37, fy:0.32, meta:"5 resources · self-paced", desc:"The highest-leverage AI skill. Learn to get great results.", badge:"Beginner" },
+  { num:"03", label:"Build with AI",     url:"building.html",      level:"intermediate",fx:0.37, fy:0.68, meta:"7 resources · self-paced", desc:"Agents, automations, real projects. Claude Code lives here.", badge:"Intermediate" },
+  { num:"04", label:"Go Deep",           url:"advanced.html",      level:"advanced",    fx:0.62, fy:0.22, meta:"5 resources · 60+ hrs",    desc:"Neural nets, transformers, LLMs. Full technical picture.", badge:"Advanced" },
+  { num:"05", label:"Podcasts",          url:"podcasts.html",      level:"all",         fx:0.62, fy:0.50, meta:"7 podcasts · ongoing",     desc:"Long-form and snackable listens to keep you current.", badge:"All Levels" },
+  { num:"06", label:"Leaders in AI",     url:"leaders-in-ai.html", level:"all",         fx:0.62, fy:0.78, meta:"10 leaders · free",        desc:"The researchers and founders shaping what comes next.", badge:"All Levels" },
+  { num:"07", label:"Newsletters",       url:"newsletters.html",   level:"all",         fx:0.87, fy:0.35, meta:"5 newsletters · free",     desc:"High-signal AI newsletters I actually open. No spam.", badge:"All Levels" },
+  { num:"08", label:"GitHub Repos",      url:"repos.html",         level:"intermediate",fx:0.87, fy:0.65, meta:"5 repos · open source",    desc:"Hands-on repos built for people who want to build.", badge:"Intermediate" },
+];
+
+// Fully-connected between adjacent layers
+const EDGES = [
+  [0,1],[0,2],           // Foundation → Skills
+  [1,3],[1,4],[1,5],     // Skills     → Depth
+  [2,3],[2,4],[2,5],
+  [3,6],[3,7],           // Depth      → Current
+  [4,6],[4,7],
+  [5,6],[5,7],
+];
+
+const LAYER_LABELS = [
+  { fx:0.13, text:"Foundation" },
+  { fx:0.37, text:"Skills"     },
+  { fx:0.62, text:"Depth"      },
+  { fx:0.87, text:"Current"    },
+];
+
+const LEVEL_RGB = {
+  beginner:     [79,209,197],
+  intermediate: [58,123,213],
+  advanced:     [160,125,224],
+  all:          [212,168,75],
+};
+
+function ca(level, a) {
+  const [r,g,b] = LEVEL_RGB[level];
+  return `rgba(${r},${g},${b},${+a.toFixed(3)})`;
+}
+
+// DOM refs
+const wrap    = document.getElementById('nnWrap');
+const canvas  = document.getElementById('nnCanvas');
+const ctx     = canvas.getContext('2d');
+const tooltip = document.getElementById('nnTooltip');
+
+let W = 0, H = 0;
+let nodePos  = [];
+let hoveredIdx = -1;
+
+// Build node elements
+const nodeEls = NODES.map((n, i) => {
+  const el = document.createElement('a');
+  el.href = n.url;
+  el.className = 'nn-node';
+  el.setAttribute('data-level', n.level);
+  el.innerHTML =
+    `<div class="nn-ring"><span class="nn-num">${n.num}</span></div>` +
+    `<div class="nn-label">${n.label}</div>` +
+    `<div class="nn-meta">${n.meta}</div>`;
+
+  const show = () => { hoveredIdx = i; showTip(i); };
+  const hide = () => { hoveredIdx = -1; tooltip.classList.remove('visible'); };
+  el.addEventListener('mouseenter', show);
+  el.addEventListener('mouseleave', hide);
+  el.addEventListener('focus',      show);
+  el.addEventListener('blur',       hide);
+  wrap.appendChild(el);
+  return el;
+});
+
+// Layer labels
+LAYER_LABELS.forEach(l => {
+  const el = document.createElement('span');
+  el.className = 'nn-layer-label';
+  el.textContent = l.text;
+  el.style.left = (l.fx * 100) + '%';
+  wrap.appendChild(el);
+});
+
+function resize() {
+  W = canvas.width  = wrap.offsetWidth;
+  H = canvas.height = wrap.offsetHeight;
+  nodePos = NODES.map(n => ({ x: Math.round(n.fx * W), y: Math.round(n.fy * H) }));
+  nodeEls.forEach((el, i) => {
+    el.style.left = nodePos[i].x + 'px';
+    el.style.top  = nodePos[i].y + 'px';
+  });
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Pulses — small dots that travel along edges left-to-right
+const pulses = [];
+let lastSpawn = 0;
+
+function spawnPulse() {
+  pulses.push({
+    edge:  Math.floor(Math.random() * EDGES.length),
+    t:     0,
+    speed: 0.0035 + Math.random() * 0.003,
+    r:     2 + Math.random() * 1.5,
+  });
+}
+
+function draw(ts) {
+  requestAnimationFrame(draw);
+
+  if (ts - lastSpawn > 500 + Math.random() * 500) {
+    if (pulses.length < 10) spawnPulse();
+    lastSpawn = ts;
+  }
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    pulses[i].t += pulses[i].speed;
+    if (pulses[i].t >= 1) pulses.splice(i, 1);
+  }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Draw edges
+  EDGES.forEach(([a, b]) => {
+    const pa = nodePos[a], pb = nodePos[b];
+    const active = hoveredIdx === a || hoveredIdx === b;
+    const alpha  = hoveredIdx === -1 ? 0.15 : (active ? 0.5 : 0.05);
+
+    const g = ctx.createLinearGradient(pa.x, pa.y, pb.x, pb.y);
+    g.addColorStop(0, ca(NODES[a].level, alpha));
+    g.addColorStop(1, ca(NODES[b].level, alpha));
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = g;
+    ctx.lineWidth = active ? 1.5 : 0.7;
+    ctx.stroke();
+  });
+
+  // Draw pulses
+  pulses.forEach(p => {
+    const [a, b] = EDGES[p.edge];
+    const pa = nodePos[a], pb = nodePos[b];
+    const x    = pa.x + (pb.x - pa.x) * p.t;
+    const y    = pa.y + (pb.y - pa.y) * p.t;
+    const lvl  = NODES[a].level;
+    const fade = Math.sin(p.t * Math.PI);
+
+    ctx.beginPath();
+    ctx.arc(x, y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = ca(lvl, fade * 0.88);
+    ctx.fill();
+
+    const grd = ctx.createRadialGradient(x, y, 0, x, y, p.r * 4);
+    grd.addColorStop(0, ca(lvl, fade * 0.32));
+    grd.addColorStop(1, ca(lvl, 0));
+    ctx.beginPath();
+    ctx.arc(x, y, p.r * 4, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+  });
+
+  // Node aura (soft radial glow on canvas under the HTML ring)
+  nodePos.forEach((pos, i) => {
+    const lvl = NODES[i].level;
+    const hov = hoveredIdx === i;
+    const r   = hov ? 48 : 32;
+    const a   = hov ? 0.18 : 0.07;
+    const grd = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, r);
+    grd.addColorStop(0, ca(lvl, a));
+    grd.addColorStop(1, ca(lvl, 0));
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+  });
+}
+
+function showTip(i) {
+  const n   = NODES[i];
+  const pos = nodePos[i];
+  const [r,g,b] = LEVEL_RGB[n.level];
+
+  tooltip.querySelector('.tt-nn-name').textContent = n.label;
+  tooltip.querySelector('.tt-nn-desc').textContent = n.desc;
+  const badge = tooltip.querySelector('.tt-nn-badge');
+  badge.textContent       = n.badge;
+  badge.style.color       = `rgb(${r},${g},${b})`;
+  badge.style.borderColor = `rgba(${r},${g},${b},0.42)`;
+
+  const TW = 188, TH = 105;
+  let left = pos.x + 44;
+  let top  = pos.y - TH / 2;
+  if (left + TW > W - 10) left = pos.x - TW - 44;
+  if (top < 10)            top  = 10;
+  if (top + TH > H - 10)  top  = H - TH - 10;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top  + 'px';
+  tooltip.classList.add('visible');
+}
+
+document.fonts.ready.then(() => requestAnimationFrame(draw));
+</script>
 </body>
 </html>
