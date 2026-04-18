@@ -171,6 +171,14 @@
   }
   .menu-item.active .menu-num { color: var(--cyan); }
 
+  .menu-label-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
   .menu-label {
     font-family: 'Rajdhani', sans-serif;
     font-weight: 600;
@@ -178,11 +186,21 @@
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--muted);
-    flex: 1;
     transition: color 0.12s;
   }
   .menu-item.active .menu-label,
   .menu-item:hover   .menu-label { color: var(--cyan); }
+
+  .menu-level {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+    color: var(--cyan-dim);
+    text-transform: uppercase;
+    transition: color 0.12s;
+  }
+  .menu-item.active .menu-level,
+  .menu-item:hover   .menu-level { color: var(--muted); }
 
   .menu-count {
     font-family: 'Share Tech Mono', monospace;
@@ -370,6 +388,45 @@
     cursor: default;
   }
 
+  /* ── SECTION PREV / NEXT NAV ──────────────── */
+  .section-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-step {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+  }
+
+  .nav-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    min-width: 60px;
+  }
+  .nav-btn:hover:not(:disabled) {
+    background: var(--cyan-mid);
+    border-color: var(--cyan);
+  }
+  .nav-btn:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* ── FOOTER KEYBIND BAR ─────────────────── */
   .keybind-bar {
     height: var(--footer-h);
@@ -449,6 +506,7 @@
     }
 
     .menu-label { font-size: 0.8rem; }
+    .menu-level { display: none; }
 
     .content-panel {
       overflow: visible;
@@ -482,23 +540,32 @@
 
   <!-- Left menu panel -->
   <nav class="menu-panel" id="menuPanel">
-    <p class="menu-header">// Sections — click to navigate</p>
+    <p class="menu-header">// Learning Path — follow in order</p>
 
     <div class="menu-item active" data-index="0">
       <span class="menu-num">01</span>
-      <span class="menu-label">Fundamentals</span>
+      <span class="menu-label-wrap">
+        <span class="menu-label">Fundamentals</span>
+        <span class="menu-level">Beginner</span>
+      </span>
       <span class="menu-count">4 RES</span>
     </div>
 
     <div class="menu-item" data-index="1">
       <span class="menu-num">02</span>
-      <span class="menu-label">Protocols</span>
+      <span class="menu-label-wrap">
+        <span class="menu-label">Protocols</span>
+        <span class="menu-level">Intermediate</span>
+      </span>
       <span class="menu-count">4 RES</span>
     </div>
 
     <div class="menu-item" data-index="2">
       <span class="menu-num">03</span>
-      <span class="menu-label">Certs &amp; Careers</span>
+      <span class="menu-label-wrap">
+        <span class="menu-label">Certs &amp; Careers</span>
+        <span class="menu-level">Intermediate</span>
+      </span>
       <span class="menu-count">3 RES</span>
     </div>
 
@@ -506,7 +573,10 @@
 
     <div class="menu-item" data-index="3">
       <span class="menu-num">04</span>
-      <span class="menu-label">Labs &amp; Practice</span>
+      <span class="menu-label-wrap">
+        <span class="menu-label">Labs &amp; Practice</span>
+        <span class="menu-level">All Levels</span>
+      </span>
       <span class="menu-count">3 RES</span>
     </div>
   </nav>
@@ -516,7 +586,7 @@
 
     <!-- ── Section 01 — Fundamentals ── -->
     <div class="section active" id="section-0">
-      <p class="section-eyebrow">// Section 01 — Beginner</p>
+      <p class="section-eyebrow">Step 1 of 4 · Beginner</p>
       <h2 class="section-title">Fundamentals</h2>
       <p class="section-subtitle">What a network is, how data moves, and the building blocks every IT professional needs locked in.</p>
 
@@ -563,11 +633,17 @@
         </a>
 
       </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" disabled></button>
+        <span class="nav-step">01 / 04</span>
+        <button class="nav-btn" data-nav="1">Next: Protocols →</button>
+      </div>
     </div>
 
     <!-- ── Section 02 — Protocols ── -->
     <div class="section" id="section-1">
-      <p class="section-eyebrow">// Section 02 — Intermediate</p>
+      <p class="section-eyebrow">Step 2 of 4 · Intermediate</p>
       <h2 class="section-title">Protocols</h2>
       <p class="section-subtitle">Go deeper — understand how traffic actually flows, what tools capture it, and why protocols behave the way they do.</p>
 
@@ -614,11 +690,17 @@
         </a>
 
       </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="0">← Fundamentals</button>
+        <span class="nav-step">02 / 04</span>
+        <button class="nav-btn" data-nav="2">Next: Certs &amp; Careers →</button>
+      </div>
     </div>
 
     <!-- ── Section 03 — Certs & Careers ── -->
     <div class="section" id="section-2">
-      <p class="section-eyebrow">// Section 03 — Intermediate</p>
+      <p class="section-eyebrow">Step 3 of 4 · Intermediate</p>
       <h2 class="section-title">Certs &amp; Careers</h2>
       <p class="section-subtitle">Map your path to professional certification and the roles that networking knowledge unlocks.</p>
 
@@ -655,11 +737,17 @@
         </a>
 
       </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="1">← Protocols</button>
+        <span class="nav-step">03 / 04</span>
+        <button class="nav-btn" data-nav="3">Next: Labs &amp; Practice →</button>
+      </div>
     </div>
 
     <!-- ── Section 04 — Labs & Practice ── -->
     <div class="section" id="section-3">
-      <p class="section-eyebrow">// Section 04 — All Levels</p>
+      <p class="section-eyebrow">Step 4 of 4 · All Levels</p>
       <h2 class="section-title">Labs &amp; Practice</h2>
       <p class="section-subtitle">Get hands-on. Simulators, virtual labs, and practice environments to drill what you've learned until it sticks.</p>
 
@@ -696,6 +784,12 @@
         </a>
 
       </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" data-nav="2">← Certs &amp; Careers</button>
+        <span class="nav-step">04 / 04</span>
+        <button class="nav-btn" disabled></button>
+      </div>
     </div>
 
   </main>
@@ -724,6 +818,11 @@
 
   menuItems.forEach((item, index) => {
     item.addEventListener('click', () => activateSection(index));
+  });
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-nav]');
+    if (btn) activateSection(parseInt(btn.dataset.nav));
   });
 
   document.addEventListener('keydown', (e) => {
