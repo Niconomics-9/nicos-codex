@@ -226,6 +226,8 @@ html, body {
 </div>
 
 <script>
+if (location.pathname.endsWith('/index.html'))
+  location.replace(location.href.replace('/index.html', '/'));
 // ── Topic data ────────────────────────────────────────────────────
 const TOPICS = [
   {
